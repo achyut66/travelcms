@@ -94,7 +94,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           {isDropdownOpen && isSidebarOpen && (
             <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
               <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faClipboardList} /> &nbsp;&nbsp;Booking
+                <Link to={"/booking"}>
+                  <FontAwesomeIcon icon={faClipboardList} /> &nbsp;&nbsp;Booking
+                </Link>
               </li>
               <li className="hover:text-blue-600 cursor-pointer">
                 <FontAwesomeIcon icon={faUsers} /> &nbsp;&nbsp;Customer
