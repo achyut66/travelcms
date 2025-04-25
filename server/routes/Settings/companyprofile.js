@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import CompanyProfile from '../models/Booking.js';
+import CompanyProfile from '../../models/Settings/CompanyProfile.js';
 
 const router = express.Router();
 

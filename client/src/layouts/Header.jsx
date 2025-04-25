@@ -18,7 +18,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-red-400 p-4 flex justify-end items-center z-50 shadow-md">
+    <nav className="fixed top-0 left-0 w-full bg-purple-600/30 backdrop-blur-md p-4 flex justify-end items-center z-50 shadow-md">
       <div className="grid grid-cols-2 items-center">
         {/* <div className="justify-self-start mr-[500px]">
           <Clock />
@@ -31,11 +31,8 @@ const Header = () => {
 
             {/* Dropdown menu */}
             <ul className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow-md opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                See Profile
-              </li>
               <li
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                className="px-4 py-2 cursor-pointer text-center text-white bg-red-600"
                 onClick={handleLogout}
               >
                 Logout

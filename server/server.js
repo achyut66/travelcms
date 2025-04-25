@@ -1,54 +1,86 @@
+import session from "express-session";
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { API_BASE_URL } from "../client/src/config.js";
+
+// Route Imports
 import authRoutes from './routes/auth.js';
-import companyProfile from './routes/companyprofile.js';
-import session from 'express-session';
-import path from 'path';  // Import the path module
-import { fileURLToPath } from 'url';  // Import fileURLToPath from the url module
+import companyProfile from './routes/Settings/companyprofile.js';
+import nationalitySettings from './routes/Settings/nationality.js';
+import packageSettings from './routes/Settings/package.js';
+import paymentStatusSettings from './routes/Settings/paymentstatus.js';
+import paymentMethodSettings from './routes/Settings/paymentmethod.js';
+import visitPurposeSettings from './routes/Settings/visitpurpose.js';
+import languageSettings from './routes/Settings/language.js';
+import bookings from './routes/Classification/booking.js';
+import protectedRoutes from './routes/protectedRoute.js';
+import guideSettings from "./routes/Settings/guide.js";
+import bookingAssistant from "./routes/Classification/assistantdetails.js";
+import bookingCompleteProfile from './routes/Classification/bookingcomplete.js';
+import bookingCancel from './routes/Classification/bookingcancel.js';
+
 
 dotenv.config();
 const app = express();
 
-// Use import.meta.url to get the directory name equivalent to __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);  // Get the current file path
-const __dirname = path.dirname(__filename);  // Get the current directory path
-
-app.use(cors({
-  origin: 'http://localhost:5173', // frontend port
-  credentials: true               // ✅ Allow credentials (cookies/sessions)
-}));
-
-app.use(express.json());
-
-app.use(session({
-  secret: 'secret-key',            // change this in prod
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false,                 // true in production with HTTPS
-    httpOnly: true
-  }
-}));
+// __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Simple route
+// Middlewares
+app.use(cors({
+  origin: ['http://localhost:5173'], // Allow requests from React frontend
+  credentials: true,
+}));
+
+app.use(express.json()); // ✅ Handles JSON data
+app.use(express.urlencoded({ extended: true })); // ✅ Handles form data
+
+app.use(session({
+  secret: "your-secret",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: false, // set to true in production with HTTPS
+    sameSite: 'lax',
+  },
+}));
+
+// Test route
 app.get("/", (req, res) => {
   res.send("Server is running!");
 });
 
+// API Routes
 app.use("/api", authRoutes);
 app.use("/api", companyProfile);
-app.use(express.urlencoded({ extended: true }));
+app.use("/api", nationalitySettings);
+app.use("/api", packageSettings);
+app.use("/api", paymentStatusSettings);
+app.use("/api", paymentMethodSettings);
+app.use("/api", visitPurposeSettings);
+app.use("/api", languageSettings);
+app.use("/api", bookings);
+app.use("/api", protectedRoutes);
+app.use("/api", guideSettings);
+app.use("/api", bookingAssistant);
+app.use("/api", bookingCompleteProfile);
+app.use("/api", bookingCancel);
 
-// Serve static files from the 'uploads' directory
+// Serve static files (uploads/images etc.)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

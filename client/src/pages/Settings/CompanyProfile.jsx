@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import Button from "../components/PButton.jsx";
-import Layout from "../layouts/Layout.jsx";
-import DynamicModal from "../components/Modal.jsx";
-import ViewModal from "../components/ViewModal.jsx";
-import Table from "../components/Table.jsx";
+import Button from "../../components/VButton.jsx";
+import Layout from "../../layouts/Layout.jsx";
+import DynamicModal from "../../components/Modal.jsx";
+import ViewModal from "../../components/ViewModal.jsx";
+import Table from "../../components/Table.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import EButton from "../components/EditBtn.jsx";
-import DButton from "../components/DangerBtn.jsx";
+import { faPlus, faPen, faEye } from "@fortawesome/free-solid-svg-icons";
+import EButton from "../../components/EditBtn.jsx";
+import Breadcrumb from "../../components/Breadscrum.jsx";
 
 export default function CompanyProfile() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -104,13 +104,13 @@ export default function CompanyProfile() {
       <>
         <Button
           className="text-blue-500"
-          label={"View"}
+          label={<FontAwesomeIcon icon={faEye} />}
           onClick={() => handleView(row._id)}
         />
         &nbsp;
         <EButton
           className="text-green-500"
-          label="Edit"
+          label={<FontAwesomeIcon icon={faPen} />}
           onClick={() => handleEdit(row._id)} // or row.id based on your data
         />
       </>
@@ -131,7 +131,7 @@ export default function CompanyProfile() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Something went wrong");
       alert("Form submitted successfully");
-      window.location.href = "/company-profile"; // Redirect after success
+      window.location.href = "/settings/company-profile"; // Redirect after success
     } catch (error) {
       console.error("Error submitting form:", error.message);
     }
@@ -201,6 +201,13 @@ export default function CompanyProfile() {
             }
           />
         </div>
+        <Breadcrumb
+          items={[
+            { label: "Home", link: "/dashboard" },
+            { label: "Settings", link: "#" },
+            { label: "Company Profille", link: "/company-profile" },
+          ]}
+        />
         {loading ? (
           <div>Loading...</div>
         ) : error ? (

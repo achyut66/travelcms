@@ -1,16 +1,38 @@
 import React, { useState, useEffect } from "react";
 import "../index.css";
-import logo from "../assets/react.svg";
+import { API_BASE_URL } from "../config";
 
 const Register = () => {
   const [passwordMatchMessage, setPasswordMatchMessage] = useState("");
+  const [profileData, setProfileData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-
+  // profile fetch
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/profile-data");
+        if (!response.ok) {
+          throw new Error("Failed to fetch profiles");
+        }
+        const result = await response.json();
+        // console.log(result);
+        setProfileData(result);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -64,9 +86,21 @@ const Register = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
         <div className="mb-6 text-center">
-          <img src={logo} alt="Logo" className="w-24 mx-auto mb-4" />
+          {profileData &&
+            profileData.map((profile, idx) => (
+              <img
+                key={idx}
+                src={`${API_BASE_URL}/uploads/${profile.company_logo}`}
+                alt="Company Logo"
+                // style={{ width: "100px", height: "100px" }}
+                className="w-34 h-34 mx-auto rounded p-6"
+              />
+            ))}
           <h2 className="text-2xl font-bold text-gray-800">
-            Register for Pokalde Travel And Tours
+            {profileData &&
+              profileData.map((profile, idx) => (
+                <span key={idx}>{profile.company_name}</span>
+              ))}
           </h2>
         </div>
 

@@ -2,16 +2,17 @@ import React from "react";
 import Sidebar from "../layouts/Sidebar";
 import Header from "../layouts/Header";
 import "../index.css";
-import Stomach from "../components/Stomach";
 import Layout from "../layouts/Layout";
+import BookingGrid from "../components/BookingGrid";
+// import Stomach from "../components/Stomach";
+import ChartGrid from "../components/extras/ChartGrid";
 
 const Dashboard = () => {
   return (
-    <div className="flex flex-row">
-      <Layout>
-        <Stomach />
-      </Layout>
-    </div>
+    <Layout>
+      <BookingGrid />
+      <ChartGrid />
+    </Layout>
   );
 };
 export default Dashboard;

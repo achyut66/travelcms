@@ -1,0 +1,53 @@
+.print-container {
+    font-family: Arial, sans-serif;
+    color: #000;
+    background: #fff;
+    padding: 20px;
+  }
+  
+  .print-title {
+    text-align: center;
+    color: #b91c1c;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  
+  .print-table th,
+  .print-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .print-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  @media screen {
+    .print-only {
+      display: none;
+    }
+  }
+  
+  @media print {
+    .screen-only {
+      display: none;
+    }
+  
+    .print-only {
+      display: block;
+    }
+  }
+  
+  

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import Select from "react-select";
 
 const DynamicModal = ({
   visible,
@@ -9,14 +9,17 @@ const DynamicModal = ({
   fields,
   onSubmit,
   defaultValues,
+  bookingId,
 }) => {
-  const [formData, setFormData] = React.useState({});
+  const [formData, setFormData] = useState({});
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (visible && defaultValues) {
       const initialData = {};
       fields.forEach((field) => {
-        initialData[field.name] = defaultValues[field.name] || "";
+        initialData[field.name] = field.multiple
+          ? defaultValues[field.name] || []
+          : defaultValues[field.name] || "";
       });
       setFormData(initialData);
     }
@@ -33,14 +36,14 @@ const DynamicModal = ({
   };
 
   const handleSubmit = () => {
-    onSubmit(formData);
+    onSubmit(formData, bookingId);
     onClose();
   };
 
   return (
     <Transition appear show={visible} as={Fragment}>
       <Dialog as="div" className="relative z-[9999]" onClose={onClose}>
-        <div className="fixed inset-0 bg-black" />
+        <div className="fixed inset-0 bg-black opacity-30" />
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
@@ -67,21 +70,51 @@ const DynamicModal = ({
                       <label className="block text-sm font-medium text-gray-700">
                         {field.label}
                       </label>
-                      <input
-                        type={field.type}
-                        name={field.name}
-                        value={
-                          field.type !== "file"
-                            ? formData[field.name]
-                            : undefined
-                        }
-                        onChange={
-                          field.type === "file"
-                            ? handleFileChange
-                            : handleChange
-                        }
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                      />
+
+                      {field.type === "select2" ? (
+                        <Select
+                          isMulti={field.multiple}
+                          name={field.name}
+                          options={field.options}
+                          value={
+                            field.multiple
+                              ? field.options.filter((opt) =>
+                                  (formData[field.name] || []).includes(
+                                    opt.value
+                                  )
+                                )
+                              : field.options.find(
+                                  (opt) => opt.value === formData[field.name]
+                                ) || null
+                          }
+                          onChange={(selected) => {
+                            const value = field.multiple
+                              ? selected.map((s) => s.value)
+                              : selected?.value || "";
+                            setFormData((prev) => ({
+                              ...prev,
+                              [field.name]: value,
+                            }));
+                          }}
+                          className="mt-1"
+                        />
+                      ) : (
+                        <input
+                          type={field.type}
+                          name={field.name}
+                          value={
+                            field.type !== "file"
+                              ? formData[field.name] || ""
+                              : undefined
+                          }
+                          onChange={
+                            field.type === "file"
+                              ? handleFileChange
+                              : handleChange
+                          }
+                          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        />
+                      )}
                     </div>
                   ))}
                 </div>

@@ -21,31 +21,34 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ message: 'Something went big wrong' });
   }
 });
+
 // login route
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
-      // Find user by username
       const user = await User.findOne({ username });
       if (!user) return res.status(400).json({ message: 'User not found' });
-  
-      // Compare entered password with hashed password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ message: 'Invalid password' });
       
       req.session.user = {
         id: user._id,
         username: user.username,
-        email: user.email
-      };
+        email: user.email,
+      };      
   
-      // Success
-      res.status(200).json({ message: 'Login successful', user: { username: user.username, email: user.email } });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error' });
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ message: "Session save failed" });
+        }
+        res.status(200).json({ message: 'Login successful', user: req.session.user });
+      });
+    } catch (error) {
+      res.status(401),json({message:"error fetching"});
     }
-  });
+    });
+  // });
 //   logout route
   router.post('/logout', (req, res) => {
     req.session.destroy(err => {
@@ -56,5 +59,4 @@ router.post('/login', async (req, res) => {
       res.json({ message: 'Logged out successfully' });
     });
   });
-
 export default router;

@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../index.css"; // Import your CSS file here
-import logo from "../assets/react.svg"; // Adjust the path as necessary
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
+
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [profileData, setProfileData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -14,17 +17,36 @@ const Login = () => {
       [e.target.name]: e.target.value,
     }));
   };
+  // profile fetch
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/profile-data");
+        if (!response.ok) {
+          throw new Error("Failed to fetch profiles");
+        }
+        const result = await response.json();
+        // console.log(result);
+        setProfileData(result);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
+  // useEffect(() => {
   const handleLogin = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/login", {
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
-
       const data = await res.json();
-
       if (res.ok) {
         // alert("Login successful!");
         navigate("/dashboard");
@@ -36,14 +58,28 @@ const Login = () => {
       setError("Something went wrong");
     }
   };
+  // });
+  // handleLogin();
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
         <div className="mb-6 text-center">
-          <img src={logo} alt="Logo" className="w-24 mx-auto mb-4" />
+          {profileData &&
+            profileData.map((profile, idx) => (
+              <img
+                key={idx}
+                src={`${API_BASE_URL}/uploads/${profile.company_logo}`}
+                alt="Company Logo"
+                // style={{ width: "100px", height: "100px" }}
+                className="w-34 h-34 mx-auto rounded p-6"
+              />
+            ))}
           <h2 className="text-2xl font-bold text-gray-800">
-            ABC Travel And Tours
+            {profileData &&
+              profileData.map((profile, idx) => (
+                <span key={idx}>{profile.company_name}</span>
+              ))}
           </h2>
         </div>
         {error && (
@@ -65,7 +101,7 @@ const Login = () => {
             />
             <label
               htmlFor="username"
-              className="absolute left-2 -top-2.5 bg-white px-1 text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-500"
+              className="absolute left-2 -top-2.5 bg-white px-1 text-xs text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-500 "
             >
               Username
             </label>
@@ -93,7 +129,7 @@ const Login = () => {
             <button
               onClick={handleLogin}
               id="login-button"
-              className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition"
+              className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition cursor-pointer"
             >
               Login
             </button>
@@ -102,7 +138,7 @@ const Login = () => {
             <Link to="/register">
               <button
                 id="register-button"
-                className="w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-md hover:bg-gray-600 transition"
+                className="w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-md hover:bg-gray-600 transition cursor-pointer"
               >
                 Register
               </button>
