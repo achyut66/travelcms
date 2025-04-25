@@ -184,21 +184,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             {isSidebarOpen && <span className="ml-2">Blog</span>}
           </li> */}
 
-          {/* <li className="hover:text-gray-400 cursor-pointer flex items-center">
-            <div
-              className={`flex items-center transition-all duration-300 ${
-                isSidebarOpen ? "justify-start" : "justify-center pr-5"
-              }`}
-            >
-              <FontAwesomeIcon
-                icon={faFile}
-                className={`transition-all duration-300 ${
-                  isSidebarOpen ? "text-xl" : "text-[30px]"
-                }`}
-              />
-            </div>
-            {isSidebarOpen && <span className="ml-2">Report</span>}
-          </li> */}
           <li
             onClick={() => setIsReportOpen(!isReportOpen)}
             className="hover:text-gray-400 cursor-pointer flex justify-between items-center"
@@ -210,7 +195,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                 }`}
               >
                 <FontAwesomeIcon
-                  icon={faRocket}
+                  icon={faFile}
                   className={`transition-all duration-300 ${
                     isSidebarOpen ? "text-xl" : "text-[30px]"
                   }`}

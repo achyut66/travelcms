@@ -18,6 +18,12 @@ export default function BookingReport() {
   const [error, setError] = useState(null);
   const [data, setData] = useState([]);
 
+  const [isBooked, setIsBooked] = useState(false);
+  const [isAssigned, setIsAssigned] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isCancelled, setIsCancelled] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("all");
+
   // Fetch data from the server
   const fetchData = async () => {
     try {
@@ -33,9 +39,72 @@ export default function BookingReport() {
     }
     setLoading(false);
   };
+  const fetchBookedData = async () => {
+    try {
+      const response = await fetch("/api/get-booked-bookings");
+      const result = await response.json();
+      if (response.ok) {
+        setIsBooked(result.data);
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      setError("An error occurred while fetching data.", error);
+    }
+    setLoading(false);
+  };
+
+  const fetchAssignedData = async () => {
+    try {
+      const response = await fetch("/api/get-assigned-bookings");
+      const result = await response.json();
+      if (response.ok) {
+        setIsAssigned(result.data);
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      setError("An error occurred while fetching data.", error);
+    }
+    setLoading(false);
+  };
+
+  const fetchCompleteData = async () => {
+    try {
+      const response = await fetch("/api/get-completed-bookings");
+      const result = await response.json();
+      if (response.ok) {
+        setIsCompleted(result.data);
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      setError("An error occurred while fetching data.", error);
+    }
+    setLoading(false);
+  };
+
+  const fetchCanceledData = async () => {
+    try {
+      const response = await fetch("/api/get-canceled-bookings");
+      const result = await response.json();
+      if (response.ok) {
+        setIsCancelled(result.data);
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      setError("An error occurred while fetching data.", error);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     fetchData();
+    fetchBookedData();
+    fetchAssignedData();
+    fetchCompleteData();
+    fetchCanceledData();
   }, []);
 
   // Define columns for the table
@@ -68,10 +137,10 @@ export default function BookingReport() {
 
   // Define filter data (booking statuses)
   const filterData = [
-    { key: "0", label: "Booked" },
-    { key: "1", label: "Assigned" },
-    { key: "3", label: "Cancelled" },
-    { key: "2", label: "Completed" },
+    { key: "0", label: "Booked", data: isBooked },
+    { key: "1", label: "Assigned", data: isAssigned },
+    { key: "3", label: "Cancelled", data: isCancelled },
+    { key: "2", label: "Completed", data: isCompleted },
   ];
 
   return (
@@ -100,11 +169,7 @@ export default function BookingReport() {
           <div className="text-red-500">{error}</div>
         ) : (
           <div className="w-full overflow-x-auto">
-            <Table
-              columns={columns}
-              data={data}
-              filterData={filterData} // Pass the filterData to the Table
-            />
+            <Table columns={columns} data={data} filterData={filterData} />
           </div>
         )}
       </Layout>

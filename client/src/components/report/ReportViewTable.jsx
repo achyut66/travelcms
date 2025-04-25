@@ -18,28 +18,20 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
     applyFilters();
   };
 
-  const applyFilters = () => {
-    let tempData = [...data];
+  const applyFilters = async () => {
+    const params = new URLSearchParams();
 
-    // Filter by date range
-    if (selectedColumn && fromDate && toDate) {
-      tempData = tempData.filter((row) => {
-        const rowDate = new Date(row[selectedColumn]);
-        return (
-          rowDate >= new Date(fromDate.setHours(0, 0, 0, 0)) &&
-          rowDate <= new Date(toDate.setHours(23, 59, 59, 999))
-        );
-      });
-    }
+    if (selectedStatus) params.append("status", selectedStatus);
+    if (selectedColumn) params.append("column", selectedColumn);
+    if (fromDate) params.append("from", fromDate.toISOString().split("T")[0]);
+    if (toDate) params.append("to", toDate.toISOString().split("T")[0]);
 
-    // Filter by booking status
-    if (selectedStatus) {
-      tempData = tempData.filter(
-        (row) => row.flag.toString() === selectedStatus
-      );
-    }
+    const response = await fetch(
+      `${API_BASE_URL}/api/filter-by-date?${params}`
+    );
+    const result = await response.json();
 
-    setFilteredData(tempData);
+    setFilteredData(result);
     setCurrentPage(1);
   };
 
@@ -125,7 +117,7 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
 
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded text-sm"
+          className="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer text-sm"
         >
           Search
         </button>

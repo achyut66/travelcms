@@ -275,7 +275,8 @@ router.get('/get-booking-by-month', async (req, res) => {
 router.get('/get-assigned-bookings', async (req, res) => {
   try {
     const result = await BookingProfile.countDocuments({ flag: 1 });
-    res.json({ result });
+    const data = await BookingProfile.find({ flag: 1 });
+    res.json({ result, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -283,7 +284,8 @@ router.get('/get-assigned-bookings', async (req, res) => {
 router.get('/get-canceled-bookings', async (req, res) => {
   try {
     const result = await BookingProfile.countDocuments({ flag: 3 });
-    res.json({ result });
+    const data = await BookingProfile.find({ flag: 3 });
+    res.json({ result, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -291,7 +293,8 @@ router.get('/get-canceled-bookings', async (req, res) => {
 router.get('/get-completed-bookings', async (req, res) => {
   try {
     const result = await BookingProfile.countDocuments({ flag: 2 });
-    res.json({ result });
+    const data = await BookingProfile.find({ flag: 2 });
+    res.json({ result, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -299,7 +302,8 @@ router.get('/get-completed-bookings', async (req, res) => {
 router.get('/get-booked-bookings', async (req, res) => {
   try {
     const result = await BookingProfile.countDocuments({ flag: 0 });
-    res.json({ result });
+    const data = await BookingProfile.find({ flag: 0 });
+    res.json({ result, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -321,6 +325,23 @@ router.get('/get-booking-status-summary', async (req, res) => {
   }
 });
 
+router.get("/filter-by-date", async (req, res) => {
+  const { from, to, column = "createdAt", status } = req.query;
+  let filter = {};
+  console.log(filter);
+  if (status) {
+    filter.flag = status;
+  }
+  if (from && to && column) {
+    filter[column] = {
+      $gte: new Date(`${from}T00:00:00.000Z`),
+      $lte: new Date(`${to}T23:59:59.999Z`)
+    };
+  }
+  const result = await BookingProfile.find(filter);
+  res.json(result);
+  
+});
 
 
 export default router;
