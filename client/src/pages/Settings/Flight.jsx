@@ -10,7 +10,7 @@ import EButton from "../../components/EditBtn.jsx";
 import DButton from "../../components/DangerBtn.jsx";
 import Breadcrumb from "../../components/Breadscrum.jsx";
 
-export default function NationalitySetting() {
+export default function FlightSetting() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [data, setData] = useState([]);
@@ -22,14 +22,14 @@ export default function NationalitySetting() {
 
   const fields = [
     {
-      name: "package",
-      label: "Package",
+      name: "airlines_name",
+      label: "Airlines Name",
       type: "text",
       defaultValue: "",
     },
     {
-      name: "rate",
-      label: "Rate",
+      name: "airlines_number",
+      label: "Airlines Number",
       type: "text",
       defaultValue: "",
     },
@@ -38,14 +38,14 @@ export default function NationalitySetting() {
   // Table data columns
   const columns = [
     { key: "index", label: "S.no" },
-    { key: "package", label: "Package" },
-    { key: "rate", label: "Rate" },
+    { key: "airlines_name", label: "Airlines Name" },
+    { key: "airlines_number", label: "Airlines Number" },
   ];
   // useeffect
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/package-data");
+        const response = await fetch("/api/flight-data");
         if (!response.ok) {
           throw new Error("Failed to fetch profiles");
         }
@@ -57,7 +57,6 @@ export default function NationalitySetting() {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -71,8 +70,8 @@ export default function NationalitySetting() {
         />
         &nbsp;
         <DButton
-          className="text-white-500"
-          label={<FontAwesomeIcon icon={faTrash} className="text-white-200" />}
+          className="text-gray-500"
+          label={<FontAwesomeIcon icon={faTrash} />}
           onClick={() => handleDelete(row._id)} // or row.id based on your data
         />
       </>
@@ -81,7 +80,7 @@ export default function NationalitySetting() {
   // Handling submit form
   const handleModalSubmit = async (formData) => {
     try {
-      const res = await fetch("/api/package-register", {
+      const res = await fetch("/api/flight-register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // <-- ADD THIS
@@ -93,7 +92,8 @@ export default function NationalitySetting() {
       if (!res.ok) throw new Error(data.message || "Something went wrong");
       console.log(res);
       alert("Form submitted successfully");
-      window.location.href = "/settings/package";
+      window.location.href = "/settings/flight";
+      setIsModalVisible(false); // Close modal after submission
     } catch (error) {
       console.error("Error submitting form:", error.message);
     }
@@ -102,7 +102,7 @@ export default function NationalitySetting() {
   const handleEditModalSubmit = async (updatedData) => {
     if (!selectedId) return;
     try {
-      const response = await fetch(`/api/package-profile/${selectedId}`, {
+      const response = await fetch(`/api/flight-profile/${selectedId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +116,7 @@ export default function NationalitySetting() {
         throw new Error(result.message || "Something went wrong");
 
       alert("Form updated successfully");
-      window.location.href = "/settings/package";
+      window.location.href = "/settings/flight";
       setIsEditModalVisible(false);
     } catch (err) {
       console.error("Error updating:", err);
@@ -126,7 +126,7 @@ export default function NationalitySetting() {
   const handleEdit = async (id) => {
     setSelectedId(id);
     try {
-      const res = await fetch(`/api/package-profile/${id}`);
+      const res = await fetch(`/api/flight-profile/${id}`);
       const data = await res.json();
       setEditFormData(data); // Set the fetched data
       setIsEditModalVisible(true); // Open modal
@@ -136,7 +136,7 @@ export default function NationalitySetting() {
   };
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`/api/package-profile/${id}`, {
+      const res = await fetch(`/api/flight-profile/${id}`, {
         method: "DELETE",
       });
 
@@ -149,10 +149,11 @@ export default function NationalitySetting() {
       console.error("Error deleting purpose:", error);
     }
   };
+
   return (
     <>
       <Layout>
-        <div className="text-left ml-[280px] mb-[-53px]">
+        <div className="text-left ml-[300px] mb-[-53px]">
           <Button
             onClick={() => setIsModalVisible(true)}
             label={
@@ -166,7 +167,7 @@ export default function NationalitySetting() {
           items={[
             { label: "Home", link: "/dashboard" },
             { label: "Settings", link: "#" },
-            { label: "Package", link: "/settings/package" },
+            { label: "Flight", link: "/settings/flight" },
           ]}
         />
         {loading ? (
@@ -182,14 +183,14 @@ export default function NationalitySetting() {
         <DynamicModal
           visible={isModalVisible}
           onClose={() => setIsModalVisible(false)}
-          title="Add Package"
+          title="Add Purpose Of Visit"
           fields={fields}
           onSubmit={handleModalSubmit}
         />
         <DynamicModal
           visible={isEditModalVisible}
           onClose={() => setIsEditModalVisible(false)}
-          title="Edit Package"
+          title="Edit Purpose Of Visit"
           fields={fields}
           onSubmit={handleEditModalSubmit}
           id={selectedId}

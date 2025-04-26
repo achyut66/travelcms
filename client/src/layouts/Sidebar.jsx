@@ -145,9 +145,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                   <FontAwesomeIcon icon={faClipboardList} /> &nbsp;&nbsp;Booking
                 </Link>
               </li>
-              <li className="hover:text-blue-600 cursor-pointer">
+              {/* <li className="hover:text-blue-600 cursor-pointer">
                 <FontAwesomeIcon icon={faUser} /> &nbsp;&nbsp;Customer
-              </li>
+              </li> */}
               <li className="hover:text-blue-600 cursor-pointer">
                 <FontAwesomeIcon icon={faLocationArrow} />{" "}
                 &nbsp;&nbsp;Destination
@@ -156,7 +156,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                 <FontAwesomeIcon icon={faBus} /> &nbsp;&nbsp;Transportation
               </li>
               <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faDollarSign} /> &nbsp;&nbsp;Expenses
+                <FontAwesomeIcon icon={faDollarSign} /> &nbsp;&nbsp;Extras
               </li>
               <li className="hover:text-blue-600 cursor-pointer">
                 <FontAwesomeIcon icon={faPlane} /> &nbsp;&nbsp;Flights
@@ -250,7 +250,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                 <li className="hover:text-blue-600 cursor-pointer">
                   <Link to="/settings/package">
                     <FontAwesomeIcon icon={faCog} />
-                    &nbsp;&nbsp;Package Setting
+                    &nbsp;&nbsp;Package
                   </Link>
                 </li>
                 <li className="hover:text-blue-600 cursor-pointer">
@@ -274,26 +274,32 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                 <li className="hover:text-blue-600 cursor-pointer">
                   <Link to="/settings/nationality">
                     <FontAwesomeIcon icon={faCog} />
-                    &nbsp;&nbsp;Nationality Setting
+                    &nbsp;&nbsp;Nationality
                   </Link>
                 </li>
                 <li className="hover:text-blue-600 cursor-pointer">
                   <Link to="/settings/language">
                     <FontAwesomeIcon icon={faCog} />
-                    &nbsp;&nbsp;Language Setting
+                    &nbsp;&nbsp;Language
                   </Link>
                 </li>
                 <li className="hover:text-blue-600 cursor-pointer">
-                  <Link to="/settings/language">
+                  <Link to="/settings/transportation">
                     <FontAwesomeIcon icon={faCog} />
-                    &nbsp;&nbsp;Vendor Setting
+                    &nbsp;&nbsp;Vehicle
+                  </Link>
+                </li>
+                <li className="hover:text-blue-600 cursor-pointer">
+                  <Link to="/settings/flight">
+                    <FontAwesomeIcon icon={faCog} />
+                    &nbsp;&nbsp;Flight
                   </Link>
                 </li>
 
                 <li className="hover:text-blue-600 cursor-pointer">
                   <Link to="/settings/guide_potter">
                     <FontAwesomeIcon icon={faCog} />
-                    &nbsp;&nbsp;Guide/Potter Setting
+                    &nbsp;&nbsp;Guide/Potter
                   </Link>
                 </li>
               </ul>

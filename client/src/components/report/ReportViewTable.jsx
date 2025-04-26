@@ -1,17 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { API_BASE_URL } from "../../config";
 import Pagination from "../../components/Pagination";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import "../../assets/css/pdf.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPrint } from "@fortawesome/free-solid-svg-icons";
 
 const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
+  const tableRef = useRef();
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState(data);
 
   const [selectedColumn, setSelectedColumn] = useState("");
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(""); // for booking status filter
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -33,6 +39,35 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
 
     setFilteredData(result);
     setCurrentPage(1);
+  };
+
+  const handleDownloadPDF = () => {
+    const input = tableRef.current;
+    if (!input) return;
+
+    html2canvas(input, {
+      useCORS: true,
+      scrollY: -window.scrollY,
+      scale: 2,
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      let position = 0;
+      if (pdfHeight <= pageHeight) {
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      } else {
+        const totalPages = Math.ceil(pdfHeight / pageHeight);
+        for (let i = 0; i < totalPages; i++) {
+          if (i > 0) pdf.addPage();
+          pdf.addImage(imgData, "PNG", 0, -i * pageHeight, pdfWidth, pdfHeight);
+        }
+      }
+      pdf.save("table.pdf");
+    });
   };
 
   const isImage = (value) => {
@@ -123,89 +158,114 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
         </button>
       </form>
 
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => window.print()}
+          className="px-4 py-4 bg-green-600 text-white rounded text-sm ml-[1170px] mt-[-60px] cursor-pointer"
+        >
+          <FontAwesomeIcon icon={faPrint} className="mr-2" />
+        </button>
+        {/* <button
+          onClick={handleDownloadPDF}
+          className="px-4 py-2 bg-red-600 text-white rounded text-sm"
+        >
+          Download PDF
+        </button> */}
+      </div>
+
       {/* Table */}
-      <table className="w-full bg-white border border-gray-200">
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th
-                key={col.key}
-                className="px-4 py-2 border-[2px] border-gray-200 text-left bg-gray-100 font-medium text-sm text-gray-700"
-              >
-                {col.label}
-              </th>
-            ))}
-            {actions && (
-              <th className="px-4 py-2 border-[2px] border-gray-200 text-left bg-gray-100 text-sm">
-                ### {/* For actions */}
-              </th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {currentData.length > 0 ? (
-            currentData.map((row, idx) => (
-              <tr
-                key={`row-${idx}`}
-                className="hover:bg-gray-200 border-gray-200 border-[1px]"
-              >
-                {columns.map((col) => {
-                  let displayValue = "--";
+      <div ref={tableRef} className="print-area">
+        <div className="text-center print-only">
+          Pokalde Adventure Tours & Travels
+          <br />
+          Thamel,12 Kathmandu- Nepal
+          <br />
+          Email: pokalde@gmail.com
+        </div>
 
-                  if (col.key === "index") {
-                    displayValue = (currentPage - 1) * itemsPerPage + idx + 1;
-                  } else if (col.render) {
-                    displayValue = col.render(row);
-                  } else {
-                    const cellValue = row[col.key];
-                    if (isImage(cellValue)) {
-                      displayValue = (
-                        <img
-                          src={`${API_BASE_URL}/uploads/${cellValue}`}
-                          alt={col.label}
-                          className="w-16 h-16 object-contain"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "";
-                          }}
-                        />
-                      );
-                    } else if (isDateTime(cellValue)) {
-                      displayValue = formatDate(cellValue);
-                    } else if (cellValue) {
-                      displayValue = cellValue;
-                    }
-                  }
-
-                  return (
-                    <td
-                      key={`${col.key}-${idx}`}
-                      className="px-4 py-2 border-[1px] border-gray-200 text-sm"
-                    >
-                      {displayValue}
-                    </td>
-                  );
-                })}
-
-                {actions && (
-                  <td className="px-4 py-2 border-[1px] border-gray-200 text-sm">
-                    {actions(row)}
-                  </td>
-                )}
-              </tr>
-            ))
-          ) : (
+        <table className="w-full bg-white border border-gray-200">
+          <thead>
             <tr>
-              <td
-                colSpan={columns.length + (actions ? 1 : 0)}
-                className="px-4 py-4 text-center text-gray-400"
-              >
-                No data found
-              </td>
+              {columns.map((col) => (
+                <th
+                  key={col.key}
+                  className="px-4 py-2 border-[2px] border-gray-200 text-left bg-gray-100 font-medium text-sm text-gray-700"
+                >
+                  {col.label}
+                </th>
+              ))}
+              {actions && (
+                <th className="px-4 py-2 border-[2px] border-gray-200 text-left bg-gray-100 text-sm">
+                  ###
+                </th>
+              )}
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {currentData.length > 0 ? (
+              currentData.map((row, idx) => (
+                <tr
+                  key={`row-${idx}`}
+                  className="hover:bg-gray-200 border-gray-200 border-[1px]"
+                >
+                  {columns.map((col) => {
+                    let displayValue = "--";
+
+                    if (col.key === "index") {
+                      displayValue = (currentPage - 1) * itemsPerPage + idx + 1;
+                    } else if (col.render) {
+                      displayValue = col.render(row);
+                    } else {
+                      const cellValue = row[col.key];
+                      if (isImage(cellValue)) {
+                        displayValue = (
+                          <img
+                            src={`${API_BASE_URL}/uploads/${cellValue}`}
+                            alt={col.label}
+                            className="w-16 h-16 object-contain"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "";
+                            }}
+                          />
+                        );
+                      } else if (isDateTime(cellValue)) {
+                        displayValue = formatDate(cellValue);
+                      } else if (cellValue) {
+                        displayValue = cellValue;
+                      }
+                    }
+
+                    return (
+                      <td
+                        key={`${col.key}-${idx}`}
+                        className="px-4 py-2 border-[1px] border-gray-200 text-sm"
+                      >
+                        {displayValue}
+                      </td>
+                    );
+                  })}
+
+                  {actions && (
+                    <td className="px-4 py-2 border-[1px] border-gray-200 text-sm">
+                      {actions(row)}
+                    </td>
+                  )}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={columns.length + (actions ? 1 : 0)}
+                  className="px-4 py-4 text-center text-gray-400"
+                >
+                  No data found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination */}
       {totalPages > 0 && (

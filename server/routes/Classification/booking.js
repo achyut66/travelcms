@@ -52,6 +52,8 @@ router.post('/booking-register', upload.fields([
       package_name, departure_date, return_date, pickup_location, drop_location,
       method, promo_code, payment_status,
       special_instruction, preferred_language, purpose,
+      pickup_date,
+      airlines_name, flight_taken_date, flight_number, flight_time,
       pax_no = 1, // default pax_no to 1 if not provided
       traveller_name = [],
       nationality = [],
@@ -68,7 +70,7 @@ router.post('/booking-register', upload.fields([
       package_name, departure_date, return_date, pickup_location, drop_location,
       method, promo_code, payment_status,
       invoice_receipt: invoiceFile ? invoiceFile.filename : '', // Save invoice filename
-      special_instruction, preferred_language, purpose,pax_no,flag
+      special_instruction, preferred_language, purpose,pax_no,flag,pickup_date,airlines_name, flight_taken_date, flight_number, flight_time,
     });
 
     const savedBooking = await booking.save();

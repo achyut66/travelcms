@@ -22,6 +22,8 @@ import guideSettings from "./routes/Settings/guide.js";
 import bookingAssistant from "./routes/Classification/assistantdetails.js";
 import bookingCompleteProfile from './routes/Classification/bookingcomplete.js';
 import bookingCancel from './routes/Classification/bookingcancel.js';
+import transportationSettings from "./routes/Settings/transportation.js";
+import flightSettings from "./routes/Settings/flight.js";
 
 
 dotenv.config();
@@ -76,6 +78,8 @@ app.use("/api", guideSettings);
 app.use("/api", bookingAssistant);
 app.use("/api", bookingCompleteProfile);
 app.use("/api", bookingCancel);
+app.use("/api", transportationSettings);
+app.use("/api", flightSettings);
 
 // Serve static files (uploads/images etc.)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

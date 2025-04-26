@@ -18,7 +18,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-purple-600/30 backdrop-blur-md p-4 flex justify-end items-center z-50 shadow-md">
+    <nav className="fixed top-0 left-0 w-full bg-red-600/60 backdrop-blur-md p-4 flex justify-end items-center z-50 shadow-md">
       <div className="grid grid-cols-2 items-center">
         {/* <div className="justify-self-start mr-[500px]">
           <Clock />

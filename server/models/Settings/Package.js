@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const packageSchema = new mongoose.Schema({
   package: { type: String, required: true },
+  rate: { type: String, required: true },
   
 },{ timestamps: true });
 

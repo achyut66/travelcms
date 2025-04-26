@@ -6,28 +6,34 @@ const router = express.Router();
 // Create Nationality
 // Inside your route handler
 router.post('/package-register', async (req, res) => {
-    console.log("Request body:", req.body);  // Log the full request body
-  
-    const { package: pkg } = req.body;
-  
-    if (!pkg || typeof pkg !== 'string') {
-      return res.status(400).json({ message: 'Package is required and must be a string' });
-    }
-  
-    try {
-      const newNationality = new packageSettings({ package: pkg });
-      await newNationality.save();
-      res.status(201).json({ message: 'Package added successfully', data: newNationality });
-    } catch (error) {
-      console.error('POST /nationality-register error:', error);
-      res.status(500).json({ message: 'Something went wrong while saving package' });
-    }
-  });
+  console.log("Request body:", req.body);  // Log the full request body
+
+  const { package: pkg } = req.body;
+  const { rate } = req.body;
+
+  if (!pkg || typeof pkg !== 'string') {
+    return res.status(400).json({ message: 'Package is required and must be a string' });
+  }
+
+  if (!rate || typeof rate !== 'string') {
+    return res.status(400).json({ message: 'Rate is required and must be a string' });
+  }
+
+  try {
+    const newNationality = new packageSettings({ package: pkg, rate }); // <-- FIXED HERE
+    await newNationality.save();
+    res.status(201).json({ message: 'Package added successfully', data: newNationality });
+  } catch (error) {
+    console.error('POST /package-register error:', error);
+    res.status(500).json({ message: 'Something went wrong while saving package' });
+  }
+});
+
   
 // Get All Nationalities
 router.get('/package-data', async (req, res) => {
   try {
-    const nationalities = await packageSettings.find().sort({ package: 1 }); // optional: sort alphabetically
+    const nationalities = await packageSettings.find(); // optional: sort alphabetically
     res.status(200).json(nationalities);
   } catch (error) {
     console.error('GET /package-data error:', error);
@@ -72,16 +78,19 @@ router.get('/package-profile/:id', async (req, res) => {
 // Update Nationality by ID
 router.put('/package-profile/:id', async (req, res) => {
   const { id } = req.params;
-  const { package:pkg } = req.body;
+  const { package:pkg,rate } = req.body;
 
   if (!pkg || typeof pkg !== 'string') {
+    return res.status(400).json({ message: 'Package is required and must be a string' });
+  }
+  if (!rate || typeof rate !== 'string') {
     return res.status(400).json({ message: 'Package is required and must be a string' });
   }
 
   try {
     const updatedNationality = await packageSettings.findByIdAndUpdate(
       id,
-      { package:pkg },
+      { package:pkg,rate },
       { new: true }
     );
 

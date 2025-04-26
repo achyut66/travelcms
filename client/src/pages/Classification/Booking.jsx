@@ -14,6 +14,7 @@ import {
   faClipboardList,
   faTimes,
   faCheckCircle,
+  faTruckPickup,
   // faSmile,
 } from "@fortawesome/free-solid-svg-icons";
 import EButton from "../../components/EditBtn.jsx";
@@ -224,14 +225,18 @@ export default function CompanyProfile() {
     {
       name: "pickup_location",
       label: "Pick-Up Location",
-      required: true,
       type: "text",
+      defaultValue: "",
+    },
+    {
+      name: "pickup_date",
+      label: "Pick-Up Date",
+      type: "date",
       defaultValue: "",
     },
     {
       name: "drop_location",
       label: "Drop Location",
-      required: true,
       type: "text",
       defaultValue: "",
     },
@@ -259,7 +264,6 @@ export default function CompanyProfile() {
     {
       name: "payment_status",
       label: "Payment Status",
-      required: true,
       type: "select2",
       options: paymentStatusData.map((pcks) => ({
         value: pcks.status,
@@ -271,11 +275,37 @@ export default function CompanyProfile() {
     {
       name: "invoice_receipt",
       label: "Invoice Receipt",
-      required: true,
       type: "file",
       defaultValue: "",
     },
-
+    // internation flight details
+    {
+      h2Title: "International Flight Details",
+    },
+    {
+      name: "airlines_name",
+      label: "Airlines Name",
+      type: "text",
+      defaultValue: "",
+    },
+    {
+      name: "flight_taken_date",
+      label: "Date",
+      type: "date",
+      defaultValue: "",
+    },
+    {
+      name: "flight_number",
+      label: "Flight Number",
+      type: "text",
+      defaultValue: "",
+    },
+    {
+      name: "flight_time",
+      label: "Flight Time",
+      type: "text",
+      defaultValue: "",
+    },
     // option fields
     {
       h2Title: "Optional Information",
@@ -815,6 +845,13 @@ export default function CompanyProfile() {
           label={<FontAwesomeIcon icon={faCheckCircle} />}
           onClick={() => openCompleteModal(row._id)}
           tooltip="Is Booking Completed?"
+        />
+        &nbsp;
+        <Button
+          className="text-green-500"
+          label={<FontAwesomeIcon icon={faTruckPickup} />}
+          onClick={() => openCompleteModal(row._id)}
+          tooltip="Assign Pickup"
         />
       </div>
     );

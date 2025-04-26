@@ -22,6 +22,8 @@ import PaymentStatusSetting from "./pages/Settings/PaymentStatus";
 import VisitPurposeSetting from "./pages/Settings/VisitPurpose";
 import LanguageSetting from "./pages/Settings/Language";
 import GuideSetting from "./pages/Settings/Guide";
+import TransportationSetting from "./pages/Settings/Transportation";
+import FlightSetting from "./pages/Settings/Flight";
 
 // reports package
 import BookingReport from "./pages/report/BookingReport";
@@ -50,6 +52,11 @@ export default function App() {
       <Route path="/settings/visitpurpose" element={<VisitPurposeSetting />} />
       <Route path="/settings/language" element={<LanguageSetting />} />
       <Route path="/settings/guide_potter" element={<GuideSetting />} />
+      <Route
+        path="/settings/transportation"
+        element={<TransportationSetting />}
+      />
+      <Route path="/settings/flight" element={<FlightSetting />} />
       {/* <Route path="/customer" element={<Customer />} />
       <Route path="/destination" element={<Destination />} />
       <Route path="/transportation" element={<Transportation />} />

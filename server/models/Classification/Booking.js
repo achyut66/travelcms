@@ -12,18 +12,24 @@ const bookingSchema = new mongoose.Schema({
   departure_date: { type: Date, required: true },
   return_date: { type: Date, required: true },
   pickup_location: { type: String, required: true },
+  pickup_date: { type: String },
   drop_location: { type: String, required: true },
 
-  method: { type: String, required: true },
+  method: { type: String},
   promo_code: { type: String },
-  payment_status: { type: String, required: true },
-  invoice_receipt: { type: String, required: true },
+  payment_status: { type: String},
+  invoice_receipt: { type: String},
 
   special_instruction: { type: String },
   preferred_language: { type: String },
   purpose: { type: String, required: true },
   pax_no: { type: Number, required: true },
   flag: { type: Number, required: true },
+
+  airlines_name: { type: String },
+  flight_taken_date : { type: Date },
+  flight_number: { type: String },
+  flight_time: { type: String },  
 }, { timestamps: true });
 
 const BookingProfile = mongoose.model('BookingProfile', bookingSchema);
