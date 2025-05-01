@@ -125,6 +125,16 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
     setCurrentPage(validPage);
   };
 
+  // total
+  const extratotal = filteredData.reduce(
+    (sum, row) => sum + (+row.extra_total || 0),
+    0
+  );
+  const packagetotal = filteredData.reduce(
+    (sum, row) => sum + (+row.package_total || 0),
+    0
+  );
+
   return (
     <div className="overflow-x-auto w-full">
       {/* Filter Section */}
@@ -189,7 +199,7 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
 
       {/* Table */}
       <div ref={tableRef} className="print-area">
-        <div className="text-center mb-4 flex flex-col items-center justify-center">
+        <div className="hidden print:flex flex-col items-center justify-center mb-4 text-center">
           <img src={logo} width={80} className="mx-auto" alt="Logo" />
           {userData?.[0] && (
             <>
@@ -223,54 +233,57 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
           <tbody>
             {currentData.length > 0 ? (
               currentData.map((row, idx) => (
-                <tr
-                  key={`row-${idx}`}
-                  className="hover:bg-gray-200 border-gray-200 border-[1px]"
-                >
-                  {columns.map((col) => {
-                    let displayValue = "--";
+                <>
+                  <tr
+                    key={`row-${idx}`}
+                    className="hover:bg-gray-200 border-gray-200 border-[1px]"
+                  >
+                    {columns.map((col) => {
+                      let displayValue = "--";
 
-                    if (col.key === "index") {
-                      displayValue = (currentPage - 1) * itemsPerPage + idx + 1;
-                    } else if (col.render) {
-                      displayValue = col.render(row);
-                    } else {
-                      const cellValue = row[col.key];
-                      if (isImage(cellValue)) {
-                        displayValue = (
-                          <img
-                            src={`${API_BASE_URL}/uploads/${cellValue}`}
-                            alt={col.label}
-                            className="w-16 h-16 object-contain"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "";
-                            }}
-                          />
-                        );
-                      } else if (isDateTime(cellValue)) {
-                        displayValue = formatDate(cellValue);
-                      } else if (cellValue) {
-                        displayValue = cellValue;
+                      if (col.key === "index") {
+                        displayValue =
+                          (currentPage - 1) * itemsPerPage + idx + 1;
+                      } else if (col.render) {
+                        displayValue = col.render(row);
+                      } else {
+                        const cellValue = row[col.key];
+                        if (isImage(cellValue)) {
+                          displayValue = (
+                            <img
+                              src={`${API_BASE_URL}/uploads/${cellValue}`}
+                              alt={col.label}
+                              className="w-16 h-16 object-contain"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "";
+                              }}
+                            />
+                          );
+                        } else if (isDateTime(cellValue)) {
+                          displayValue = formatDate(cellValue);
+                        } else if (cellValue) {
+                          displayValue = cellValue;
+                        }
                       }
-                    }
 
-                    return (
-                      <td
-                        key={`${col.key}-${idx}`}
-                        className="px-4 py-2 border-[1px] border-gray-200 text-sm"
-                      >
-                        {displayValue}
+                      return (
+                        <td
+                          key={`${col.key}-${idx}`}
+                          className="px-4 py-2 border-[1px] border-gray-200 text-sm"
+                        >
+                          {displayValue}
+                        </td>
+                      );
+                    })}
+
+                    {actions && (
+                      <td className="px-4 py-2 border-[1px] border-gray-200 text-sm">
+                        {actions(row)}
                       </td>
-                    );
-                  })}
-
-                  {actions && (
-                    <td className="px-4 py-2 border-[1px] border-gray-200 text-sm">
-                      {actions(row)}
-                    </td>
-                  )}
-                </tr>
+                    )}
+                  </tr>
+                </>
               ))
             ) : (
               <tr>
@@ -282,6 +295,14 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
                 </td>
               </tr>
             )}
+            <tr>
+              <td colSpan={8} className="text-center text-lg font-bold">
+                Total
+              </td>
+              <td className="text-center font-bold">{extratotal}</td>
+              <td className="text-center font-bold">{packagetotal}</td>
+              <td>&nbsp;</td>
+            </tr>
           </tbody>
         </table>
       </div>

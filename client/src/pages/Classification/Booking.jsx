@@ -990,11 +990,21 @@ export default function CompanyProfile() {
         "return_date",
         "pickup_location",
         "drop_location",
+        "pickup_date",
       ],
     },
     {
       section: "Payment Information",
       fields: ["method", "promo_code", "payment_status", "invoice_receipt"],
+    },
+    {
+      section: "International Flight Details",
+      fields: [
+        "airlines_name",
+        "flight_taken_date",
+        "flight_time",
+        "flight_number",
+      ],
     },
     {
       section: "Optional Information",

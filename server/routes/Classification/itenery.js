@@ -116,22 +116,26 @@ router.put('/itenery-profile/:id', async (req, res) => {
     }
   });
 
-  router.get('/getby-packagename/:package_name', async (req, res) => {
-    const { packageName } = req.params;
-  
-    try {
-      const itinerary = await itenerySettings.find({ package_name });
-  
-      if (itinerary.length === 0) {
-        return res.status(404).json({ message: 'Itinerary not found' });
-      }
-  
-      res.status(200).json(itinerary);
-    } catch (error) {
-      console.error(`GET /getby-packagename/${package_name} error:`, error);
-      res.status(500).json({ message: 'Error retrieving itinerary' });
+  // routes/yourRoutes.js
+router.get('/getby-packagename/:package_name', async (req, res) => {
+  const { package_name } = req.params; // ✅ Fix: match the route param name
+  console.log("Received package_name:", package_name);
+
+  try {
+    const itinerary = await itenerySettings.find({ package_name: package_name }); // ✅ Assumes DB field is `packageName`
+
+    if (itinerary.length === 0) {
+      return res.status(404).json({ message: 'Itinerary not found' });
     }
-  });
+
+    res.status(200).json(itinerary);
+  } catch (error) {
+    console.error(`GET /getby-packagename/${package_name} error:`, error);
+    res.status(500).json({ message: 'Error retrieving itinerary' });
+  }
+});
+
+  
   
   
 

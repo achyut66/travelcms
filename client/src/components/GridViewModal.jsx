@@ -23,8 +23,14 @@ const ViewModal = ({
   const fetchItinerary = async (packageName) => {
     try {
       const response = await fetch(`/api/getby-packagename/${packageName}`);
-      const result = await response.json(); // .json() needed for fetch
-      setIteneryData(result);
+      const result = await response.json();
+
+      if (response.ok) {
+        setIteneryData(result);
+      } else {
+        console.warn("No itinerary found:", result.message);
+        setIteneryData([]); // fallback to empty
+      }
     } catch (error) {
       console.error("Error fetching itinerary:", error);
     }
@@ -88,8 +94,8 @@ const ViewModal = ({
   //   };
 
   const letterHead = `
-    <span class='text-sm'>ABC Travels & Tours</span><br>
-    <span>Thamel-12, Kathmandu</span><br>
+    <span class='text-sm'>Pokalde Adventure Tours & Travel</span><br>
+    <span>Thamel-11, Kathmandu</span><br>
     <span>Nepal</span>
   `;
 
@@ -257,11 +263,11 @@ const ViewModal = ({
                 </div>
                 <div ref={printRef} className="print-container print-only">
                   <div className="text-center">
-                    ABC Travel & Tours
+                    Pokalde Adventure Tours & Travel
                     <br />
-                    Thamel,12 Kathmandu- Nepal
+                    Thamel,11 Kathmandu- Nepal
                     <br />
-                    Email: abc@gmail.com
+                    Email: pokalde@gmail.com
                   </div>
 
                   {displayColumns.map((section, idx) => (

@@ -7,6 +7,7 @@ import {
   faPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 export default function BookingGrid() {
   const [bookingCount, setBookingCount] = useState(0);
@@ -121,7 +122,9 @@ export default function BookingGrid() {
             }`}
             onClick={handleView}
           >
-            <NotificationBadge count={newbooking} />
+            <Link to={"/classification/booking"}>
+              <NotificationBadge count={newbooking} />
+            </Link>
           </div>
 
           {/* Icon */}

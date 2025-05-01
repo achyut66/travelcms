@@ -337,7 +337,7 @@ router.get('/get-booking-status-summary', async (req, res) => {
 router.get("/filter-by-date", async (req, res) => {
   const { from, to, column = "createdAt", status } = req.query;
   let filter = {};
-  console.log(filter);
+  // console.log(filter);
   if (status) {
     filter.flag = status;
   }
