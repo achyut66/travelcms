@@ -1,13 +1,13 @@
-import React, { useState, useRef,useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { API_BASE_URL } from "../../config";
 import Pagination from "../../components/Pagination";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import "../../assets/css/pdf.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
+import logo from "../../../public/images/logo.png";
+import "../../../src/index.css";
+import "../../../src/assets/css/pdf.css";
 
 const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,33 +55,39 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
     setCurrentPage(1);
   };
 
-  const handleDownloadPDF = () => {
+  const handlePrint = () => {
     const input = tableRef.current;
     if (!input) return;
 
-    html2canvas(input, {
-      useCORS: true,
-      scrollY: -window.scrollY,
-      scale: 2,
-    }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      let position = 0;
-      if (pdfHeight <= pageHeight) {
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      } else {
-        const totalPages = Math.ceil(pdfHeight / pageHeight);
-        for (let i = 0; i < totalPages; i++) {
-          if (i > 0) pdf.addPage();
-          pdf.addImage(imgData, "PNG", 0, -i * pageHeight, pdfWidth, pdfHeight);
-        }
-      }
-      pdf.save("table.pdf");
-    });
+    const printWindow = window.open("", "", "height=700,width=900");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Receipt</title>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            td, th { border: 1px solid #000; padding: 8px; text-align: left; }
+            .text-center { text-align: center; }
+            .text-right { text-align: right; }
+            .no-border { border: none; }
+            input {
+              border: none;
+              outline: none;
+              background: transparent;
+              font-size: 16px;
+            }
+          </style>
+        </head>
+        <body>
+          ${input.outerHTML}
+        </body>
+      </html>
+    `);
+    // printWindow.document.write(input.outerHTML);
+    // printWindow.document.write("</body></html>");
+    printWindow.document.close();
+    printWindow.print();
   };
 
   const isImage = (value) => {
@@ -174,30 +180,29 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
 
       <div className="flex gap-2 mb-4">
         <button
-          onClick={() => window.print()}
+          onClick={handlePrint}
           className="px-4 py-4 bg-green-600 text-white rounded text-sm ml-[1170px] mt-[-60px] cursor-pointer"
         >
           <FontAwesomeIcon icon={faPrint} className="mr-2" />
         </button>
-        {/* <button
-          onClick={handleDownloadPDF}
-          className="px-4 py-2 bg-red-600 text-white rounded text-sm"
-        >
-          Download PDF
-        </button> */}
       </div>
 
       {/* Table */}
       <div ref={tableRef} className="print-area">
-        <div className="text-center print-only">
-          Pokalde Adventure Tours & Travels
-          <br />
-          Thamel,12 Kathmandu- Nepal
-          <br />
-          Email: pokalde@gmail.com
+        <div className="text-center mb-4 flex flex-col items-center justify-center">
+          <img src={logo} width={80} className="mx-auto" alt="Logo" />
+          {userData?.[0] && (
+            <>
+              <div className="text-lg font-bold">
+                {userData[0].company_name}
+              </div>
+              <div>{userData[0].company_address}</div>
+              <div>Nepal</div>
+            </>
+          )}
         </div>
 
-        <table className="w-full bg-white border border-gray-200">
+        <table className="w-full bg-white border-collapse border border-gray-200">
           <thead>
             <tr>
               {columns.map((col) => (

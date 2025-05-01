@@ -24,6 +24,13 @@ export default function BookingReport() {
   const [isCancelled, setIsCancelled] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("all");
 
+  const filterData = [
+    { key: "0", label: "Booked", data: isBooked },
+    { key: "1", label: "Assigned", data: isAssigned },
+    { key: "3", label: "Cancelled", data: isCancelled },
+    { key: "2", label: "Completed", data: isCompleted },
+  ];
+
   // Fetch data from the server
   const fetchData = async () => {
     try {
@@ -117,6 +124,8 @@ export default function BookingReport() {
     { key: "departure_date", label: "Departure Date" },
     { key: "return_date", label: "Return Date" },
     { key: "pax_no", label: "Pax No" },
+    { key: "extra_total", label: "Extras" },
+    { key: "package_total", label: "Package" },
     {
       key: "flag",
       label: "Booking Status",
@@ -136,12 +145,6 @@ export default function BookingReport() {
   ];
 
   // Define filter data (booking statuses)
-  const filterData = [
-    { key: "0", label: "Booked", data: isBooked },
-    { key: "1", label: "Assigned", data: isAssigned },
-    { key: "3", label: "Cancelled", data: isCancelled },
-    { key: "2", label: "Completed", data: isCompleted },
-  ];
 
   return (
     <>
