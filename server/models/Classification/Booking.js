@@ -29,7 +29,11 @@ const bookingSchema = new mongoose.Schema({
   airlines_name: { type: String },
   flight_taken_date : { type: Date },
   flight_number: { type: String },
-  flight_time: { type: String },  
+  flight_time: { type: String }, 
+  
+  extra_total: {type:Number},
+  package_total: {type:Number},
+
 }, { timestamps: true });
 
 const BookingProfile = mongoose.model('BookingProfile', bookingSchema);

@@ -97,7 +97,7 @@ const DynamicModal = ({
               leaveFrom="translate-x-0 opacity-100"
               leaveTo="-translate-x-full opacity-0"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-[890px] transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900 text-center"
@@ -115,26 +115,62 @@ const DynamicModal = ({
 
                         {(formData[field.name] || []).map((entry, idx) => (
                           <div key={idx} className="flex gap-2 mb-2">
-                            {field.fields.map((subField) => (
-                              <input
-                                key={subField.name}
-                                type={subField.type}
-                                placeholder={subField.placeholder}
-                                value={entry[subField.name] || ""}
-                                onChange={(e) => {
-                                  const updatedGroup = [
-                                    ...formData[field.name],
-                                  ];
-                                  updatedGroup[idx][subField.name] =
-                                    e.target.value;
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    [field.name]: updatedGroup,
-                                  }));
-                                }}
-                                className="block w-full border border-gray-300 rounded-md p-2"
-                              />
-                            ))}
+                            {field.fields.map((subField) => {
+                              const isReadOnly =
+                                subField.name === "extra_item_amount";
+                              const value = entry[subField.name] || "";
+
+                              return (
+                                <input
+                                  key={subField.name}
+                                  type={subField.type}
+                                  placeholder={subField.placeholder}
+                                  value={value}
+                                  readOnly={isReadOnly}
+                                  onChange={(e) => {
+                                    const updatedGroup = [
+                                      ...formData[field.name],
+                                    ];
+                                    const newValue = e.target.value;
+
+                                    updatedGroup[idx][subField.name] = newValue;
+
+                                    // Automatically calculate amount if both price and quantity are present
+                                    const price =
+                                      parseFloat(
+                                        updatedGroup[idx]["extra_item_price"]
+                                      ) || 0;
+                                    const quantity =
+                                      parseFloat(
+                                        updatedGroup[idx]["extra_item_quantity"]
+                                      ) || 0;
+
+                                    if (
+                                      updatedGroup[idx]["extra_item_price"] !==
+                                        undefined &&
+                                      updatedGroup[idx][
+                                        "extra_item_quantity"
+                                      ] !== undefined
+                                    ) {
+                                      updatedGroup[idx]["extra_item_amount"] = (
+                                        price * quantity
+                                      ).toFixed(2);
+                                    }
+
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      [field.name]: updatedGroup,
+                                    }));
+                                  }}
+                                  className={`block w-full border border-gray-300 rounded-md p-2 ${
+                                    isReadOnly
+                                      ? "bg-gray-100 text-gray-700"
+                                      : ""
+                                  }`}
+                                />
+                              );
+                            })}
+
                             <button
                               type="button"
                               className="bg-red-500 text-white px-2 rounded"

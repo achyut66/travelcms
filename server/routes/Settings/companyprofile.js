@@ -21,7 +21,8 @@ router.post('/profile-register', upload.single('company_logo'), async (req, res)
     company_name,
     company_address,
     contact_person,
-    contact_number
+    contact_number,
+    vat_no,
   } = req.body;
 
   const company_logo = req.file?.filename || "";
@@ -31,7 +32,8 @@ router.post('/profile-register', upload.single('company_logo'), async (req, res)
       company_address,
       contact_person,
       contact_number,
-      company_logo
+      company_logo,
+      vat_no
     });
 
     await comProfile.save();

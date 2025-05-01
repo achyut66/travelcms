@@ -1,7 +1,11 @@
 import React from "react";
 import Button from "../components/Button.jsx";
 import { Link } from "react-router-dom";
-import "../index.css";
+import ExchangeRateTable from "../components/extras/ExchangeRateAll.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
+import DButton from "../components/PowerBtn.jsx";
+
 // import Clock from "../components/Clock.jsx";
 
 const Header = () => {
@@ -18,30 +22,27 @@ const Header = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-red-600/60 backdrop-blur-md p-4 flex justify-end items-center z-50 shadow-md">
-      <div className="grid grid-cols-2 items-center">
-        {/* <div className="justify-self-start mr-[500px]">
-          <Clock />
-        </div> */}
-        <div className="flex justify-end relative mr-[-80px]">
-          <div className="relative group">
-            <div className="bg-white text-gray-800 rounded-[4px] p-0 flex items-center cursor-pointer">
-              <Button label={"Profile"} />
-            </div>
-
-            {/* Dropdown menu */}
-            <ul className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow-md opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
-              <li
-                className="px-4 py-2 cursor-pointer text-center text-white bg-red-600"
+    <>
+      <nav className="fixed top-0 left-0 w-full bg-blue-400 backdrop-blur-md p-4 flex justify-end items-center z-50 shadow-md">
+        <div className="grid grid-cols-2 items-center">
+          <div className="flex justify-end relative">
+            {/* <div className="fixed"> */}
+            <div className="relative bg-white rounded-[4px] p-0 flex items-right cursor-pointer z-50 mt-[-13px] mr-[-22px] z-999">
+              <DButton
+                label={<FontAwesomeIcon icon={faPowerOff} />}
+                className="text-black-500"
                 onClick={handleLogout}
-              >
-                Logout
-              </li>
-            </ul>
+              />
+            </div>
+            {/* </div> */}
           </div>
         </div>
+      </nav>
+
+      <div className="fixed top-0 left-0 w-full mt-[37px] z-80">
+        <ExchangeRateTable />
       </div>
-    </nav>
+    </>
   );
 };
 

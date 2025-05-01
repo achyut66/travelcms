@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment } from "react";
+import React, { useState, useRef, Fragment, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { API_BASE_URL } from "../config";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,6 +17,24 @@ const ViewModal = ({
   const printRef = useRef(null);
   const [expandedImg, setExpandedImg] = useState(null);
   const [expandedInvoice, setExpandedInvoice] = useState(null);
+  const [iteneryData, setIteneryData] = useState([]);
+  // console.log(displayColumns);
+  // console.log(iteneryData);
+  const fetchItinerary = async (packageName) => {
+    try {
+      const response = await fetch(`/api/getby-packagename/${packageName}`);
+      const result = await response.json(); // .json() needed for fetch
+      setIteneryData(result);
+    } catch (error) {
+      console.error("Error fetching itinerary:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (data?.package_name) {
+      fetchItinerary(data.package_name);
+    }
+  }, [data?.package_name]);
 
   if (!data) return null;
 
@@ -41,10 +59,7 @@ const ViewModal = ({
     await new Promise((res) => setTimeout(res, 100));
 
     try {
-      const canvas = await html2canvas(el, input, {
-        scale: 2,
-        useCORS: true,
-      });
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true });
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
@@ -77,6 +92,19 @@ const ViewModal = ({
     <span>Thamel-12, Kathmandu</span><br>
     <span>Nepal</span>
   `;
+
+  // console.log(displayColumns);
+  // const getIteneryData = async (id) => {
+  //   try {
+  //     const response = await fetch(
+  //       `${API_BASE_URL}/api/itenery-profile/${id}`
+  //     );
+  //     const data = await response.json();
+  //     setItineryData(data);
+  //   } catch (error) {
+  //     console.error("Error fetching itinerary data:", error);
+  //   }
+  // };
 
   return (
     <Transition appear show={visible} as={Fragment}>
@@ -112,6 +140,7 @@ const ViewModal = ({
                       <h3 className="text-md font-semibold text-red-700 text-center mb-4 border-b pb-1">
                         {section.section}
                       </h3>
+                      {/* {console.log(section)} */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm text-gray-700">
                         {section.fields.map((field) => (
                           <div
@@ -124,6 +153,7 @@ const ViewModal = ({
                               {field.replace(/_/g, " ")}:
                             </span>
 
+                            {/* Check if the field is "invoice_receipt" */}
                             {field === "invoice_receipt" ? (
                               <img
                                 crossOrigin="anonymous"
@@ -136,9 +166,15 @@ const ViewModal = ({
                                   )
                                 }
                               />
+                            ) : field.includes("date") ? ( // Check if field includes "date"
+                              <span className="block text-gray-900 font-bold">
+                                {data[field]?.slice(0, 10)}{" "}
+                                {/* Show only YYYY-MM-DD */}
+                              </span>
                             ) : (
                               <span className="block text-gray-900 font-bold">
-                                {data[field] || "N/A"}
+                                {data[field] || "N/A"}{" "}
+                                {/* Show the value or "N/A" if the field is empty */}
                               </span>
                             )}
                           </div>
@@ -196,41 +232,74 @@ const ViewModal = ({
                           ))}
                         </tbody>
                       </table>
+                      <div className="text-center font-bold text-red-600 mt-[12px]">
+                        Itenery Details
+                      </div>
+                      <hr
+                        style={{
+                          width: "100%",
+                          borderWidth: "1px",
+                          color: "red",
+                          marginBottom: "20px",
+                        }}
+                      />
+                      <ul>
+                        {iteneryData.map((itenery, idx) => (
+                          <li key={idx}>
+                            <div className="text-sm font-sm italic">
+                              {itenery.itinerary}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                 </div>
                 <div ref={printRef} className="print-container print-only">
-                  <div className="text-center" style={{}}>
+                  <div className="text-center">
                     ABC Travel & Tours
                     <br />
                     Thamel,12 Kathmandu- Nepal
                     <br />
                     Email: abc@gmail.com
                   </div>
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
                   {displayColumns.map((section, idx) => (
-                    <div key={idx} style={{ marginBottom: "30px" }}>
+                    <div key={idx} style={{ marginBottom: "10px" }}>
                       <h3 className="print-title">{section.section}</h3>
                       <div
                         style={{
                           display: "grid",
                           gridTemplateColumns: "repeat(4, 1fr)",
-                          gap: "20px",
+                          gap: "10px",
                         }}
                       >
-                        {section.fields.map((field) => (
-                          <div key={field}>
-                            <div
-                              style={{ fontWeight: "600", marginBottom: "5px" }}
-                            >
-                              {field.replace(/_/g, " ")}:
+                        {section.fields.map((field) => {
+                          let value = data[field] || "N/A"; // Default to "N/A" if no data exists
+
+                          // Check if the field is a date and format it
+                          if (field.includes("date") && value !== "N/A") {
+                            value = new Date(value).toISOString().slice(0, 10); // Format as YYYY-MM-DD
+                          }
+
+                          return (
+                            <div key={field}>
+                              <div
+                                style={{
+                                  fontWeight: "600",
+                                  marginBottom: "5px",
+                                }}
+                              >
+                                {field.replace(/_/g, " ")}:
+                              </div>
+                              <div>{value}</div>
                             </div>
-                            <div>{data[field] || "N/A"}</div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   ))}
+
                   {travellers.length > 0 && (
                     <table className="print-table">
                       <thead>
@@ -240,7 +309,6 @@ const ViewModal = ({
                           <th>Nationality</th>
                           <th>Special Req.</th>
                           <th>Passport No.</th>
-                          {/* <th>Visa Copy</th> */}
                         </tr>
                       </thead>
                       <tbody>
@@ -251,22 +319,25 @@ const ViewModal = ({
                             <td>{traveller.nationality}</td>
                             <td>{traveller.special_request}</td>
                             <td>{traveller.passport_number}</td>
-                            {/* <td>
-                              {traveller.visa_copies ? (
-                                <img
-                                  src={`${API_BASE_URL}/uploads/booking/visa/${traveller.visa_copies}`}
-                                  alt="Visa"
-                                  className="print-img"
-                                />
-                              ) : (
-                                "N/A"
-                              )}
-                            </td> */}
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   )}
+
+                  <div className="text-center font-bold text-red-600">
+                    Itinerary Details
+                  </div>
+                  <ul>
+                    {iteneryData.map((itenery, idx) => (
+                      <li
+                        key={idx}
+                        style={{ fontStyle: "italic", fontSize: "12px" }}
+                      >
+                        {itenery.itinerary}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
                 {expandedImg && (

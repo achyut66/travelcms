@@ -48,6 +48,12 @@ export default function CompanyProfile() {
       defaultValue: "",
     },
     {
+      name: "vat_no",
+      label: "VAT Number",
+      type: "text",
+      defaultValue: "",
+    },
+    {
       name: "company_logo",
       label: "Company Logo",
       type: "file",
@@ -60,6 +66,7 @@ export default function CompanyProfile() {
     { key: "index", label: "S.no" },
     { key: "company_name", label: "Company Name" },
     { key: "contact_person", label: "Contact Person" },
+    { key: "vat_no", label: "VAT Number" },
     { key: "company_logo", label: "Company Logo" },
   ];
   // useeffect
@@ -154,7 +161,7 @@ export default function CompanyProfile() {
       if (!response.ok)
         throw new Error(result.message || "Something went wrong");
       alert("Form updated successfully");
-      window.location.href = "/company-profile"; // Redirect after success
+      window.location.href = "/settings/company-profile"; // Redirect after success
       setIsEditModalVisible(false);
     } catch (err) {
       console.error("Error updating:", err);
@@ -190,7 +197,7 @@ export default function CompanyProfile() {
   return (
     <>
       <Layout>
-        <div className="py-2 w-10 text-right">
+        {/* <div className="py-2 w-10 text-right">
           <Button
             disabled={datacount > 0}
             onClick={() => setIsModalVisible(true)}
@@ -200,7 +207,7 @@ export default function CompanyProfile() {
               </>
             }
           />
-        </div>
+        </div> */}
         <Breadcrumb
           items={[
             { label: "Home", link: "/dashboard" },
@@ -244,6 +251,7 @@ export default function CompanyProfile() {
             "contact_person",
             "contact_number",
             "company_logo",
+            "vat_no",
           ]} // specify the columns to show
         />
       </Layout>

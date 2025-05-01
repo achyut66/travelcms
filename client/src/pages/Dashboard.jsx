@@ -10,7 +10,9 @@ import ChartGrid from "../components/extras/ChartGrid";
 const Dashboard = () => {
   return (
     <Layout>
-      <BookingGrid />
+      <div className="mt-[-22px]">
+        <BookingGrid />
+      </div>
       <ChartGrid />
     </Layout>
   );

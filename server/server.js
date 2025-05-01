@@ -24,6 +24,10 @@ import bookingCompleteProfile from './routes/Classification/bookingcomplete.js';
 import bookingCancel from './routes/Classification/bookingcancel.js';
 import transportationSettings from "./routes/Settings/transportation.js";
 import flightSettings from "./routes/Settings/flight.js";
+import itenerySettings from './routes/Classification/itenery.js';
+import assignPickup from './routes/Classification/assignpickup.js';
+import extrasSettings from './routes/Classification/extras.js';
+import receiptProfile from "./routes/Classification/receiptprint.js";
 
 
 dotenv.config();
@@ -80,6 +84,10 @@ app.use("/api", bookingCompleteProfile);
 app.use("/api", bookingCancel);
 app.use("/api", transportationSettings);
 app.use("/api", flightSettings);
+app.use("/api", itenerySettings);
+app.use("/api", assignPickup);
+app.use("/api", extrasSettings);
+app.use("/api", receiptProfile);
 
 // Serve static files (uploads/images etc.)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

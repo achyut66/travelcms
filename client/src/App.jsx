@@ -24,6 +24,8 @@ import LanguageSetting from "./pages/Settings/Language";
 import GuideSetting from "./pages/Settings/Guide";
 import TransportationSetting from "./pages/Settings/Transportation";
 import FlightSetting from "./pages/Settings/Flight";
+import Itenerary from "./pages/Classification/Itenerary/Itinery";
+import ExtraDetails from "./pages/Classification/Extras/ExtraDetails";
 
 // reports package
 import BookingReport from "./pages/report/BookingReport";
@@ -67,6 +69,8 @@ export default function App() {
 
       {/* reports routes */}
       <Route path="/report/booking" element={<BookingReport />} />
+      <Route path="/classification/itinery" element={<Itenerary />} />
+      <Route path="/classification/extras" element={<ExtraDetails />} />
     </Routes>
   );
 }

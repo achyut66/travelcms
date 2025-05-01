@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef,useEffect } from "react";
 import { API_BASE_URL } from "../../config";
 import Pagination from "../../components/Pagination";
 import DatePicker from "react-datepicker";
@@ -10,9 +10,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
 
 const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
-  const tableRef = useRef();
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState(data);
+  const tableRef = useRef();
+  const [userData, setUserData] = useState([]);
 
   const [selectedColumn, setSelectedColumn] = useState("");
   const [fromDate, setFromDate] = useState(null);
@@ -23,6 +24,19 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
     e.preventDefault();
     applyFilters();
   };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profiledata = await fetch("/api/profile-data");
+        const result = await profiledata.json();
+        setUserData(result);
+      } catch (error) {
+        console.log("error fetching profile", error);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const applyFilters = async () => {
     const params = new URLSearchParams();

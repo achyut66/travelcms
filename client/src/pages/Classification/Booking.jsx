@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../components/VButton.jsx";
+import RButton from "../../components/ReceiptBtn.jsx";
 import Layout from "../../layouts/Layout.jsx";
 import DynamicModal from "../../components/GridModal.jsx";
 import DynamicEditModal from "../../components/EditGridModal.jsx";
 import ViewModal from "../../components/GridViewModal.jsx";
+import ReceiptViewModal from "../../components/ReceiptModal.jsx";
 import Table from "../../components/Table.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,6 +17,7 @@ import {
   faTimes,
   faCheckCircle,
   faTruckPickup,
+  faReceipt,
   // faSmile,
 } from "@fortawesome/free-solid-svg-icons";
 import EButton from "../../components/EditBtn.jsx";
@@ -26,14 +29,20 @@ import Breadcrumb from "../../components/Breadscrum.jsx";
 import DynamicAccessModal from "../../components/Modal.jsx";
 import BookingCompleteModal from "../../components/Modal.jsx";
 import BookingCancelModal from "../../components/Modal.jsx";
+import PickUpModal from "../../components/Modal.jsx";
 
 export default function CompanyProfile() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isAccessModalVisible, setIsAccessModalVisible] = useState(false);
+
   const [isCompleteModalVisible, setIsCompleteModalVisible] = useState(false);
+  const [isPickUpModalVisible, setIsPickUpModalVisible] = useState(false);
   const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
+
+  const [dataWithPotter, setdataWithPotter] = useState(null); // to hold fetched data
+  const [isVehicleUsed, setIsVehicleUsed] = useState([]);
 
   const [packageData, setPackageData] = useState([]);
   const [paymentMethodData, setPaymentMethodData] = useState([]);
@@ -46,18 +55,18 @@ export default function CompanyProfile() {
 
   const [data, setData] = useState([]);
   const [travellerData, setTravellerData] = useState([]);
+  const [travellerReceiptData, setReceiptTravellerData] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [viewFormData, setViewFormData] = useState(null); // to hold fetched data
+  const [viewReceiptFormData, setViewReceiptFormData] = useState(null); // to hold fetched data
   const [editFormData, setEditFormData] = useState(null); // Add this at the top
   const [editTravellerData, setEditTravellerData] = useState(null); // Add this at the top
 
-  // cancel status
-  // const [iscancel, setIsCancel] = useState(false);
-  // const [isComplete, setIsComplete] = useState(false);
-  // const [isAccess, setIsAccess] = useState(false);
+  // if booking is completed
+  const [ifComplete, setIfComplete] = useState("");
 
   const [potterData, setPotterData] = useState([]);
-  const [dataWithPotter, setdataWithPotter] = useState([]);
+  const [isReceiptModalVisible, setIsReceiptModalVisible] = useState(false);
 
   // package state
   const getPackageData = async () => {
@@ -131,7 +140,6 @@ export default function CompanyProfile() {
       setLoading(false);
     }
   };
-
   const getPotterData = async () => {
     try {
       const response = await fetch("/api/guide-data");
@@ -139,6 +147,16 @@ export default function CompanyProfile() {
       setPotterData(data);
     } catch (error) {
       console.error("Error fetching potter data:", error.message);
+    }
+  };
+  // console.log(isVehicleUsed);
+  const getVehicleUsed = async () => {
+    try {
+      const response = await fetch("/api/vehicle-data");
+      const data = await response.json();
+      setIsVehicleUsed(data);
+    } catch (error) {
+      console.error("Error fetching vehicle used data:", error.message);
     }
   };
 
@@ -151,6 +169,7 @@ export default function CompanyProfile() {
     getLanguageData();
     getBookingData();
     getPotterData();
+    getVehicleUsed();
   }, []);
 
   // Handling submit form
@@ -429,6 +448,18 @@ export default function CompanyProfile() {
         },
       ],
     },
+    // itenery details
+    // {
+    //   h2Title: "Itenery Details",
+    // },
+    // {
+    //   name: "pax_no",
+    //   label: "No of PAX",
+    //   required: true,
+    //   type: "number",
+    //   isNote: true,
+    //   defaultValue: "",
+    // },
   ];
 
   // handling access
@@ -461,14 +492,55 @@ export default function CompanyProfile() {
       required: true,
       defaultValue: "",
     },
+    // {
+    //   name: "package_rate",
+    //   label: "Rate Booking",
+    //   type: "number",
+    //   defaultValue: "",
+    // },
+  ];
+  // pickup field
+  const fieldsPickup = [
     {
-      name: "package_rate",
-      label: "Rate Booking",
-      type: "number",
+      name: "pickup_date",
+      label: "Pick-Up Date",
+      type: "date",
+      required: true,
+      defaultValue: "",
+    },
+    {
+      name: "assigned_person",
+      label: "Name of Assigned Person",
+      type: "select2",
+      required: true,
+      options: potterData.map((pck) => ({
+        value: pck.contact_name,
+        label: pck.contact_name,
+      })),
+    },
+    {
+      name: "pickup_time",
+      label: "Pick-Up Time",
+      type: "time",
+      defaultValue: "",
+    },
+    {
+      name: "vehicle_used",
+      label: "Name of Vehicle Used",
+      type: "select2",
+      required: true,
+      options: isVehicleUsed.map((pck) => ({
+        value: pck.vehicle_type,
+        label: pck.vehicle_type,
+      })),
+    },
+    {
+      name: "vehicle_charge",
+      label: "Vehicle Charge",
+      type: "string",
       defaultValue: "",
     },
   ];
-
   // cancel feild
   const fieldsCancel = [
     {
@@ -679,6 +751,26 @@ export default function CompanyProfile() {
       console.error("Failed to fetch data for edit:", error);
     }
   };
+  const handleReceiptView = async (id) => {
+    setSelectedId(id);
+    try {
+      const res = await fetch(`/api/get-booking-with-travellers/${id}`);
+      const data = await res.json();
+
+      // Check if data.data is available before setting state
+      if (data.data) {
+        setViewReceiptFormData(data.data);
+        setReceiptTravellerData(data.data.travellers);
+        setIsReceiptModalVisible(true);
+      } else {
+        // Handle case when data.data is not available
+        console.error("No data found for this booking");
+      }
+    } catch (error) {
+      console.error("Failed to fetch data for edit:", error);
+    }
+  };
+
   const handleEdit = async (id) => {
     setSelectedId(id);
     try {
@@ -699,7 +791,6 @@ export default function CompanyProfile() {
     try {
       const res = await fetch(`/api/get-booking-with-travellers/${id}`);
       const result = await res.json();
-      // console.log(result);
       if (!res.ok)
         throw new Error(result.message || "Failed to fetch edit data");
       setdataWithPotter(result.data);
@@ -710,26 +801,14 @@ export default function CompanyProfile() {
     }
   };
 
-  // const handleCancel = async (id) => {
-  //   if (window.confirm("Are you sure you want to cancel this booking?")) {
-  //     try {
-  //       const res = await fetch(`/api/cancel-booking/${id}`, {
-  //         method: "GET",
-  //       });
-  //       const result = await res.json();
-  //       if (!res.ok) throw new Error(result.message || "Cancellation failed");
-  //       alert("Booking cancelled successfully!");
-  //       window.location.reload();
-  //     } catch (error) {
-  //       console.error("Cancellation error:", error);
-  //       alert("Error: " + error.message);
-  //     }
-  //   }
-  // };
-
   const openCompleteModal = (id) => {
     setSelectedId(id);
     setIsCompleteModalVisible(true);
+  };
+
+  const openPickUpModal = (id) => {
+    setSelectedId(id);
+    setIsPickUpModalVisible(true);
   };
 
   const handleComplete = async (id, formData) => {
@@ -787,29 +866,51 @@ export default function CompanyProfile() {
       alert(error.message);
     }
   };
-  // console.log(iscancel);
-  // status check and show display button active / inactive
-  // const checkCancelStatus = async (id) => {
-  //   try {
-  //     const res = await fetch(`/api/get-cancel-count/${id}`);
-  //     const result = await res.json();
-  //     if (res.ok) {
-  //       setIsCancel(result.count);
-  //     } else {
-  //       throw new Error(result.message || "Failed to check cancel status");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking cancel status:", error);
-  //   }
-  // };
-  // handle edit view
-  const renderActions = (row) => {
-    const handleHover = () => {
-      // checkCancelStatus(row._id);
-      // checkCompleteStatus(row._id);
-      // checkAssignedStatus(row._id);
+
+  const handlePickUp = async (id, formData) => {
+    // console.log(formData);
+    try {
+      const res = await fetch("/api/pickup-register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          booking_id: id,
+          pickup_date: formData.pickup_date,
+          assigned_person: formData.assigned_person,
+          pickup_time: formData.pickup_time,
+          vehicle_used: formData.vehicle_used,
+          vehicle_charge: formData.vehicle_charge,
+        }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to post data");
+      alert("Pick-up Assigned Successfully.");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error completing booking:", error);
+      alert(error.message);
+    }
+  };
+
+  useEffect(() => {
+    const fetchIfCompleteOnly = async () => {
+      try {
+        const completeOnly = await fetch("/api/getifbookingcompleted");
+        const result = await completeOnly.json();
+        setIfComplete(result);
+        // console.log(result);
+      } catch (error) {
+        console.log("Error while fetching completed booking", error);
+      }
     };
 
+    fetchIfCompleteOnly();
+  }, []); // Empty dependency array to run the effect only once
+  // handle edit view
+  const renderActions = (row) => {
+    const handleHover = () => {};
     return (
       <div onMouseEnter={handleHover}>
         <Button
@@ -824,13 +925,7 @@ export default function CompanyProfile() {
           label={<FontAwesomeIcon icon={faPen} />}
           onClick={() => handleEdit(row._id)}
           tooltip="Edit Booking"
-        />
-        &nbsp;
-        <PUButton
-          className="text-gray-500"
-          label={<FontAwesomeIcon icon={faClipboardList} />}
-          onClick={() => handleAccess(row._id)}
-          tooltip="Assign Task To"
+          disabled={row.flag === 2}
         />
         &nbsp;
         <DButton
@@ -838,6 +933,23 @@ export default function CompanyProfile() {
           label={<FontAwesomeIcon icon={faTimes} />}
           onClick={() => openCancelModal(row._id)}
           tooltip="Cancel Booking"
+          disabled={row.flag === 2}
+        />
+        &nbsp;
+        <PUButton
+          className="text-gray-500"
+          label={<FontAwesomeIcon icon={faClipboardList} />}
+          onClick={() => handleAccess(row._id)}
+          tooltip="Assign Task To"
+          disabled={row.flag === 2}
+        />
+        &nbsp;
+        <Button
+          className="text-green-red-500"
+          label={<FontAwesomeIcon icon={faTruckPickup} />}
+          onClick={() => openPickUpModal(row._id)}
+          tooltip="Assign Pickup"
+          disabled={row.flag === 2}
         />
         &nbsp;
         <SButton
@@ -845,18 +957,20 @@ export default function CompanyProfile() {
           label={<FontAwesomeIcon icon={faCheckCircle} />}
           onClick={() => openCompleteModal(row._id)}
           tooltip="Is Booking Completed?"
+          disabled={row.flag === 2}
         />
         &nbsp;
-        <Button
-          className="text-green-500"
-          label={<FontAwesomeIcon icon={faTruckPickup} />}
-          onClick={() => openCompleteModal(row._id)}
-          tooltip="Assign Pickup"
-        />
+        {row.flag === 2 ? (
+          <RButton
+            className="text-green-500"
+            label={<FontAwesomeIcon icon={faReceipt} />}
+            tooltip="Generate Receipt"
+            onClick={() => handleReceiptView(row._id)}
+          />
+        ) : null}
       </div>
     );
   };
-
   const displayColumns = [
     {
       section: "Customer Information",
@@ -921,7 +1035,7 @@ export default function CompanyProfile() {
           ]}
         />
         {loading ? (
-          <div>Loading...</div>
+          <div>&nbsp;</div>
         ) : error ? (
           <div className="text-red-500">{error}</div>
         ) : (
@@ -983,6 +1097,26 @@ export default function CompanyProfile() {
             handleComplete(selectedId, formData); // Submit form from modal
           }}
         />
+        <PickUpModal
+          visible={isPickUpModalVisible}
+          onClose={() => setIsPickUpModalVisible(false)}
+          title="Pick-Up Information"
+          fields={fieldsPickup}
+          onSubmit={(formData) => {
+            handlePickUp(selectedId, formData); // Submit form from modal
+          }}
+        />
+
+        {viewReceiptFormData ? (
+          <ReceiptViewModal
+            visible={isReceiptModalVisible}
+            onClose={() => setIsReceiptModalVisible(false)}
+            receiptData={viewReceiptFormData}
+            travellers={travellerReceiptData}
+          />
+        ) : (
+          <div>&nbsp;</div> // Or any other loading state
+        )}
       </Layout>
     </>
   );

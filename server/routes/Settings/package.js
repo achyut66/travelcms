@@ -6,7 +6,6 @@ const router = express.Router();
 // Create Nationality
 // Inside your route handler
 router.post('/package-register', async (req, res) => {
-  console.log("Request body:", req.body);  // Log the full request body
 
   const { package: pkg } = req.body;
   const { rate } = req.body;
@@ -72,6 +71,22 @@ router.get('/package-profile/:id', async (req, res) => {
   } catch (error) {
     console.error(`GET /package-profile/${id} error:`, error);
     res.status(500).json({ message: 'Error retrieving nationality' });
+  }
+});
+
+// get rate by package_name
+
+router.get('/get-rate-by-package/:package_name', async (req, res) => {
+  const { package_name } = req.params; // Corrected parameter name
+  try {
+    const response = await packageSettings.findOne({ package: package_name }); // Use package_name instead of pkg
+    if (!response) {
+      return res.status(404).json({ message: "Package not found" });
+    }
+    res.json(response);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

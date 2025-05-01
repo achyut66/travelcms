@@ -148,21 +148,25 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
               {/* <li className="hover:text-blue-600 cursor-pointer">
                 <FontAwesomeIcon icon={faUser} /> &nbsp;&nbsp;Customer
               </li> */}
-              <li className="hover:text-blue-600 cursor-pointer">
+              {/* <li className="hover:text-blue-600 cursor-pointer">
                 <FontAwesomeIcon icon={faLocationArrow} />{" "}
                 &nbsp;&nbsp;Destination
               </li>
               <li className="hover:text-blue-600 cursor-pointer">
                 <FontAwesomeIcon icon={faBus} /> &nbsp;&nbsp;Transportation
-              </li>
+              </li> */}
               <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faDollarSign} /> &nbsp;&nbsp;Extras
+                <Link to={"/classification/extras"}>
+                  <FontAwesomeIcon icon={faDollarSign} /> &nbsp;&nbsp;Extras
+                </Link>
               </li>
-              <li className="hover:text-blue-600 cursor-pointer">
+              {/* <li className="hover:text-blue-600 cursor-pointer">
                 <FontAwesomeIcon icon={faPlane} /> &nbsp;&nbsp;Flights
-              </li>
+              </li> */}
               <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faRoute} /> &nbsp;&nbsp;Itinerary
+                <Link to={"/classification/itinery"}>
+                  <FontAwesomeIcon icon={faRoute} /> &nbsp;&nbsp;Itinerary
+                </Link>
               </li>
             </ul>
           )}
@@ -339,7 +343,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
       {/* Clock floats next to sidebar */}
       <div
-        className={`items-left z-[999] mt-[10px] flex transition-all duration-200 fixed ${
+        className={`items-left z-[999] mt-[4px] flex transition-all duration-200 fixed ${
           isSidebarOpen ? "ml-[260px]" : "ml-[100px]"
         }`}
       >

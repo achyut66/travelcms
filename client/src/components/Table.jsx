@@ -9,6 +9,7 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState(null);
 
+  // console.log(data);
   const fetchResults = async (query) => {
     const trimmedQuery = query;
     // console.log(trimmedQuery);
@@ -116,7 +117,7 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
             ))}
             {actions && (
               <th className="px-4 py-2 border-[2px] border-gray-200 text-left bg-gray-100 text-sm">
-                ###
+                Actions
               </th>
             )}
           </tr>
@@ -128,6 +129,7 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
                 key={`row-${idx}`}
                 className="hover:bg-gray-200 border-gray-200 border-[1px]"
               >
+                {/* {console.log(row.flag)} */}
                 {columns.map((col) => {
                   let displayValue = "--";
 
@@ -151,6 +153,9 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
                       );
                     } else if (isDateTime(cellValue)) {
                       displayValue = formatDate(cellValue);
+                    } else if (col.key === "itinerary") {
+                      // Custom rendering for itinerary
+                      displayValue = row.itinerary.join(", ");
                     } else if (cellValue) {
                       displayValue = cellValue;
                     }
@@ -169,10 +174,9 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
                     </td>
                   );
                 })}
-
                 {actions && (
-                  <td className="px-4 py-2 border-[1px] border-gray-200 text-sm">
-                    {actions(row)}
+                  <td className="flex px-4 py-2 border-[1px] border-gray-200 text-sm">
+                    <div className="flex items-center">{actions(row)}</div>
                   </td>
                 )}
               </tr>

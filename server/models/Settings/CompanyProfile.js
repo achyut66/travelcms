@@ -6,6 +6,7 @@ const companyProfileSchema = new mongoose.Schema({
   contact_person: { type: String, required: true },
   contact_number: { type: String, required: true },
   company_logo: { type: String, required: true },
+  vat_no:{type:String},
   
 },{ timestamps: true });
 

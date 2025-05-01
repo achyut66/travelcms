@@ -17,22 +17,104 @@
       animation: blinkShrink 1s ease-in-out infinite;
     }
   }
-
-  @media print {
-    body * {
-      visibility: hidden;
+  @keyframes marquee {
+    0% {
+      transform: translateX(100%);
     }
-  
-    .print-area,
-    .print-area * {
-      visibility: visible;
-    }
-  
-    .print-area {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
+    100% {
+      transform: translateX(-100%);
     }
   }
+  
+  .animate-marquee {
+    animation: marquee 25s linear infinite;
+  }
+  
+  @media print {
+    /* General adjustments for print */
+    body {
+      font-size: 12px; /* Adjust font size if necessary */
+      margin: 0; /* Remove default margins */
+      padding: 0;
+      width: 100%;
+    }
+  
+    .print-container {
+      width: 100%;
+      page-break-before: always;
+      page-break-after: always;
+      font-family: Arial, sans-serif; /* Optional: change font to a cleaner one for print */
+      line-height: 1.5; /* Adjust line height for readability */
+    }
+  
+    .print-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0;
+      padding: 10px 0;
+    }
+  
+    /* Ensure the content doesn't overflow and fits into the page */
+    .print-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+  
+    .print-table th,
+    .print-table td {
+      padding: 5px;
+      border: 1px solid black;
+      font-size: 12px;
+    }
+  
+    /* Adjust grid layout */
+    .print-container > div {
+      margin-bottom: 10px; /* Decrease margin between sections */
+      page-break-inside: avoid; /* Avoid splitting sections across pages */
+    }
+  
+    /* Print everything on a single page */
+    @page {
+      size: A4; /* Use A4 size paper */
+      margin: 0; /* No margins for the page */
+      padding: 0;
+    }
+  
+    /* Prevent page breaks between sections */
+    .print-container {
+      page-break-inside: avoid;
+    }
+  
+    /* Control the overflow behavior */
+    .print-container {
+      overflow: visible; /* Ensure content is visible */
+    }
+  }
+  /* receipt print input border remove */
+  .only-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+  }
+  @keyframes marquee {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  
+  .animate-marquee {
+    display: inline-flex;
+    animation: marquee 30s linear infinite;
+  }
+  .group:hover .marquee {
+    animation-play-state: paused;
+  }
+  
+  
+  
+  
 

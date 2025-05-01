@@ -7,6 +7,9 @@ import fs from 'fs';
 import BookingProfile from '../../models/Classification/Booking.js';
 import TravellerProfile from '../../models/Classification/TravellerDetails.js';
 import assistantProfile from '../../models/Classification/AssistantDetails.js'; // Import your model
+import extrasSettings  from '../../models/Classification/Extras.js';
+// import  packageSettings  from '../../models/Settings/Package.js';
+import bookingCompleteProfile from '../../models/Classification/BookingComplete.js';  // Import your model
 import mongoose from 'mongoose';
 import { count } from 'console';
 import nodemailer from 'nodemailer';
@@ -41,6 +44,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// register router api
 router.post('/booking-register', upload.fields([
   { name: 'invoice_receipt', maxCount: 1 },
   { name: 'visa_copies[]', maxCount: 20 } // Allow up to 20 visa files
@@ -60,6 +64,8 @@ router.post('/booking-register', upload.fields([
       passport_number = [],
       special_request = [],
       flag = 0,
+      extra_total = 0,
+      package_total = 0,
     } = req.body;
 
     // Get the uploaded invoice file
@@ -71,6 +77,7 @@ router.post('/booking-register', upload.fields([
       method, promo_code, payment_status,
       invoice_receipt: invoiceFile ? invoiceFile.filename : '', // Save invoice filename
       special_instruction, preferred_language, purpose,pax_no,flag,pickup_date,airlines_name, flight_taken_date, flight_number, flight_time,
+      extra_total,package_total,
     });
 
     const savedBooking = await booking.save();
@@ -344,6 +351,45 @@ router.get("/filter-by-date", async (req, res) => {
   res.json(result);
   
 });
+
+router.get("/get-isassigned-booking", async (req, res) => {
+  try {
+    const result = await BookingProfile.find({ flag: 1 });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// fetch data to report
+// router.get('/get-booking-with-expense', async (req, res) => {
+//   try {
+//     const data = await BookingProfile.aggregate([
+//       {
+//         $lookup: {
+//           from: "extras", // collection name in lowercase & plural
+//           localField: "_id",     // BookingProfile._id
+//           foreignField: "booking_id", // extrasSettings.booking_id
+//           as: "extras"
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: "is_booking_completes", // collection name in lowercase & plural
+//           localField: "_id",        // BookingProfile._id
+//           foreignField: "booking_id", // packageSettings.booking_id
+//           as: "package"
+//         }
+//       }
+//     ]);
+
+//     res.status(200).json(data);
+//   } catch (error) {
+//     console.error("Fetch Error:", error.message);
+//     res.status(500).json({ message: "Error fetching data" });
+//   }
+// });
+
 
 
 export default router;
