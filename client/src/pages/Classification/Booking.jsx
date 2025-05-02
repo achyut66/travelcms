@@ -30,6 +30,7 @@ import DynamicAccessModal from "../../components/Modal.jsx";
 import BookingCompleteModal from "../../components/Modal.jsx";
 import BookingCancelModal from "../../components/Modal.jsx";
 import PickUpModal from "../../components/Modal.jsx";
+import { toast } from "react-toastify";
 
 export default function CompanyProfile() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -567,7 +568,7 @@ export default function CompanyProfile() {
           }
         }
       });
-      // Step 2: Add traveller info
+
       const travellers = formData.pax_details || [];
       if (!Array.isArray(travellers) || travellers.length === 0) {
         throw new Error("At least one traveller is required.");
@@ -596,20 +597,16 @@ export default function CompanyProfile() {
         }
       });
 
-      // Step 3: Submit to API
       const response = await fetch("/api/booking-register", {
         method: "POST",
         body: formPayload,
       });
 
       const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Submission failed");
-      }
-
-      alert("Booking submitted successfully!");
-      window.location.reload();
+      toast.success(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Submission error:", error);
       alert("Error: " + error.message);
@@ -651,8 +648,10 @@ export default function CompanyProfile() {
         }
       );
       const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Update failed");
-      alert("Booking updated successfully!");
+      toast.warn(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
       setIsEditModalVisible(false); // Close the modal after successful update
       getBookingData(); // Refresh the data after update
     } catch (error) {
@@ -689,9 +688,10 @@ export default function CompanyProfile() {
           return result;
         })
       );
-      console.log("All submissions successful:", responses);
-      alert("Assistants registered.");
-      window.location.reload();
+      toast.success(responses[0]?.message || "All assistants added");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       alert(error.message);
     }
@@ -755,6 +755,7 @@ export default function CompanyProfile() {
       console.error("Failed to fetch data for edit:", error);
     }
   };
+
   const handleReceiptView = async (id) => {
     setSelectedId(id);
     try {
@@ -790,13 +791,12 @@ export default function CompanyProfile() {
       alert("Error fetching edit data: " + error.message);
     }
   };
+
   const handleAccess = async (id) => {
     setSelectedId(id);
     try {
       const res = await fetch(`/api/get-booking-with-travellers/${id}`);
       const result = await res.json();
-      if (!res.ok)
-        throw new Error(result.message || "Failed to fetch edit data");
       setdataWithPotter(result.data);
       setIsAccessModalVisible(true);
     } catch (error) {
@@ -831,9 +831,10 @@ export default function CompanyProfile() {
         }),
       });
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message || "Failed to post data");
-      alert("Booking completed successfully.");
-      window.location.reload();
+      toast.success(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error completing booking:", error);
       alert(error.message);
@@ -859,12 +860,11 @@ export default function CompanyProfile() {
       });
 
       const result = await res.json();
-      if (!res.ok)
-        throw new Error(result.message || "Failed to cancel booking");
-
-      alert("Booking canceled successfully.");
+      toast.error(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
       setIsCancelModalVisible(false);
-      window.location.reload(); // Or update your state if you're using a table
     } catch (error) {
       console.error("Error cancelling booking:", error);
       alert(error.message);
@@ -889,9 +889,10 @@ export default function CompanyProfile() {
         }),
       });
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message || "Failed to post data");
-      alert("Pick-up Assigned Successfully.");
-      window.location.reload();
+      toast.success(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error completing booking:", error);
       alert(error.message);

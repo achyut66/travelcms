@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "../components/Button.jsx";
 import { Link } from "react-router-dom";
 import ExchangeRateTable from "../components/extras/ExchangeRateAll.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import DButton from "../components/PowerBtn.jsx";
+import DashboardNotification from "../components/extras/ToastNotification";
+import { isSessionValid, clearSession } from "../utils/session";
+import { useNavigate } from "react-router-dom";
 
 // import Clock from "../components/Clock.jsx";
 
@@ -20,6 +23,21 @@ const Header = () => {
       window.location.href = "/";
     }
   };
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!isSessionValid()) {
+      clearSession();
+      alert("Session expired!");
+      navigate("/");
+    }
+    const timer = setTimeout(() => {
+      clearSession();
+      alert("Session expired!");
+      navigate("/");
+    }, 60 * 60 * 1000); // 1 minute timeout
+
+    return () => clearTimeout(timer); // Clean on unmount
+  }, [navigate]);
 
   return (
     <>

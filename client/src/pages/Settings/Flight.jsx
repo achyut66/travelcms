@@ -9,6 +9,7 @@ import { faPlus, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import EButton from "../../components/EditBtn.jsx";
 import DButton from "../../components/DangerBtn.jsx";
 import Breadcrumb from "../../components/Breadscrum.jsx";
+import { toast } from "react-toastify";
 
 export default function FlightSetting() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -89,10 +90,10 @@ export default function FlightSetting() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Something went wrong");
-      console.log(res);
-      alert("Form submitted successfully");
-      window.location.href = "/settings/flight";
+      toast.success(data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
       setIsModalVisible(false); // Close modal after submission
     } catch (error) {
       console.error("Error submitting form:", error.message);
@@ -112,11 +113,10 @@ export default function FlightSetting() {
 
       const result = await response.json();
 
-      if (!response.ok)
-        throw new Error(result.message || "Something went wrong");
-
-      alert("Form updated successfully");
-      window.location.href = "/settings/flight";
+      toast.warn(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
       setIsEditModalVisible(false);
     } catch (err) {
       console.error("Error updating:", err);
@@ -135,16 +135,16 @@ export default function FlightSetting() {
     }
   };
   const handleDelete = async (id) => {
+    if (!window.confirm("You really want to delete?")) return;
     try {
       const res = await fetch(`/api/flight-profile/${id}`, {
         method: "DELETE",
       });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete");
-      }
-      alert("Deleted successfully !!!");
-      window.location.reload();
+      const data = await res.json();
+      toast.error(data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error deleting purpose:", error);
     }

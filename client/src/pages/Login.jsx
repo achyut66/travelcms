@@ -3,6 +3,7 @@ import "../index.css"; // Import your CSS file here
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config";
+import setSession from "../../src/utils/session";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -48,7 +49,7 @@ const Login = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        // alert("Login successful!");
+        setSession();
         navigate("/dashboard");
       } else {
         setError(data.message || "Login failed");
@@ -58,8 +59,6 @@ const Login = () => {
       setError("Something went wrong");
     }
   };
-  // });
-  // handleLogin();
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">

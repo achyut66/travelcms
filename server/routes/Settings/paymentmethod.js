@@ -64,7 +64,7 @@ router.delete('/payment-method-profile/:id', async (req, res) => {
       return res.status(404).json({ message: 'Visit purpose not found' });
     }
 
-    res.status(200).json({ message: 'Visit purpose deleted successfully' });
+    res.status(200).json({ message: 'Method deleted successfully' });
   } catch (error) {
     console.error(`DELETE /delete-purpose-profile/${id} error:`, error);
     res.status(500).json({ message: 'Error deleting visit purpose' });
@@ -90,7 +90,7 @@ router.put('/payment-method-profile/:id', async (req, res) => {
       return res.status(404).json({ message: 'payment method not found' });
     }
 
-    res.status(200).json({ message: 'Payment Method updated successfully', data: updatedNationality });
+    res.status(200).json({ message: 'Method updated successfully', data: updatedNationality });
   } catch (error) {
     console.error(`PUT /payment-method-profile/${id} error:`, error);
     res.status(500).json({ message: 'Error updating payment status' });

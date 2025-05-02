@@ -56,15 +56,12 @@ router.get('/payment-status-profile/:id', async (req, res) => {
 // delete
 router.delete('/payment-status-profile/:id', async (req, res) => {
   const { id } = req.params;
-
   try {
     const deletedPurpose = await paymentStatusSettings.findByIdAndDelete(id);
-
     if (!deletedPurpose) {
       return res.status(404).json({ message: 'Visit purpose not found' });
     }
-
-    res.status(200).json({ message: 'Visit purpose deleted successfully' });
+    res.status(200).json({ message: 'Status deleted successfully !!!' });
   } catch (error) {
     console.error(`DELETE /delete-purpose-profile/${id} error:`, error);
     res.status(500).json({ message: 'Error deleting visit purpose' });

@@ -21,7 +21,7 @@ router.post('/package-register', async (req, res) => {
   try {
     const newNationality = new packageSettings({ package: pkg, rate }); // <-- FIXED HERE
     await newNationality.save();
-    res.status(201).json({ message: 'Package added successfully', data: newNationality });
+    res.status(201).json({ message: 'Package added successfully !!!', data: newNationality });
   } catch (error) {
     console.error('POST /package-register error:', error);
     res.status(500).json({ message: 'Something went wrong while saving package' });
@@ -49,8 +49,7 @@ router.delete('/package-profile/:id', async (req, res) => {
     if (!deletedPurpose) {
       return res.status(404).json({ message: 'Visit purpose not found' });
     }
-
-    res.status(200).json({ message: 'Visit purpose deleted successfully' });
+    res.status(200).json({ message: 'Visit purpose deleted successfully !!!' });
   } catch (error) {
     console.error(`DELETE /delete-purpose-profile/${id} error:`, error);
     res.status(500).json({ message: 'Error deleting visit purpose' });
@@ -112,8 +111,7 @@ router.put('/package-profile/:id', async (req, res) => {
     if (!updatedNationality) {
       return res.status(404).json({ message: 'Nationality not found' });
     }
-
-    res.status(200).json({ message: 'Package updated successfully', data: updatedNationality });
+    res.status(200).json({ message: 'Package updated successfully !!!', data: updatedNationality });
   } catch (error) {
     console.error(`PUT /package-profile/${id} error:`, error);
     res.status(500).json({ message: 'Error updating nationality' });

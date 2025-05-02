@@ -5,9 +5,10 @@ import DynamicModal from "../../components/Modal.jsx";
 import ViewModal from "../../components/ViewModal.jsx";
 import Table from "../../components/Table.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faPen, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faEye } from "@fortawesome/free-solid-svg-icons";
 import EButton from "../../components/EditBtn.jsx";
 import Breadcrumb from "../../components/Breadscrum.jsx";
+import { toast } from "react-toastify";
 
 export default function CompanyProfile() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -136,9 +137,10 @@ export default function CompanyProfile() {
         body: formPayload,
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Something went wrong");
-      alert("Form submitted successfully");
-      window.location.href = "/settings/company-profile"; // Redirect after success
+      toast.success(data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     } catch (error) {
       console.error("Error submitting form:", error.message);
     }
@@ -158,10 +160,10 @@ export default function CompanyProfile() {
         throw new Error("Failed to update company profile");
       }
       const result = await response.json();
-      if (!response.ok)
-        throw new Error(result.message || "Something went wrong");
-      alert("Form updated successfully");
-      window.location.href = "/settings/company-profile"; // Redirect after success
+      toast.warn(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
       setIsEditModalVisible(false);
     } catch (err) {
       console.error("Error updating:", err);

@@ -9,6 +9,7 @@ import { faPlus, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import EButton from "../../../components/EditBtn.jsx";
 import DButton from "../../../components/DangerBtn.jsx";
 import Breadcrumb from "../../../components/Breadscrum.jsx";
+import { toast } from "react-toastify";
 
 export default function NationalitySetting() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -136,15 +137,11 @@ export default function NationalitySetting() {
 
         // Handle response
         const data = await res.json();
-        if (!res.ok)
-          throw new Error(
-            data.message || "Something went wrong while saving itinerary."
-          );
+        toast.success(data.message);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       }
-
-      // Once all iterations are done, show success
-      alert("All itineraries submitted successfully");
-      window.location.href = "/classification/itinery"; // or any other redirect you prefer
     } catch (error) {
       console.error("Error submitting form:", error.message);
     }
@@ -154,28 +151,24 @@ export default function NationalitySetting() {
     if (!selectedId) return;
     try {
       const payload = {
-        package_name: editFormData?.package_name, // add package_name
-        itinerary: updatedData.itinerary, // add updated itinerary
+        package_name: editFormData?.package_name,
+        itinerary: updatedData.itinerary,
       };
+
       const response = await fetch(`/api/itenery-profile/${selectedId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload), // send the combined payload
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          result.message || "Something went wrong while updating itinerary."
-        );
-      }
-
-      alert("Itinerary updated successfully");
-      window.location.reload();
       setIsEditModalVisible(false);
+      toast.warn(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (err) {
       console.error("Error updating itinerary:", err);
     }
@@ -203,11 +196,11 @@ export default function NationalitySetting() {
       const res = await fetch(`/api/itenery-profile/${id}`, {
         method: "DELETE",
       });
-      if (!res.ok) {
-        throw new Error("Failed to delete");
-      }
-      alert("Deleted successfully !!!");
-      window.location.reload();
+      const data = await res.json();
+      toast.error(data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error deleting purpose:", error);
     }

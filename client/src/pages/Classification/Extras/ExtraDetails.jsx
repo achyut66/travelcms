@@ -8,6 +8,7 @@ import { faPlus, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Breadcrumb from "../../../components/Breadscrum.jsx";
 import EButton from "../../../components/EditBtn.jsx";
 import DButton from "../../../components/DangerBtn.jsx";
+import { toast } from "react-toastify";
 
 export default function ExtraDetails() {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false); // Separate modal visibility state
@@ -136,7 +137,6 @@ export default function ExtraDetails() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this extra?")) return;
-
     try {
       const res = await fetch(`/api/extras-profile/${id}`, {
         method: "DELETE",
@@ -153,8 +153,8 @@ export default function ExtraDetails() {
         .filter((group) => group.extras.length > 0);
 
       setData(updatedData);
-      alert("Deleted successfully.");
-      window.location.href = "/classification/extras";
+      const result = await res.json();
+      toast.error(result.message);
     } catch (error) {
       console.error("Delete error:", error.message);
       alert("Error deleting.");
@@ -206,14 +206,8 @@ export default function ExtraDetails() {
         });
 
         const data = await res.json();
-        if (!res.ok)
-          throw new Error(
-            data.message || "Something went wrong while saving extras."
-          );
+        toast.success(data.message);
       }
-
-      alert("Extras submitted successfully");
-      window.location.href = "/classification/extras"; // Or refetch data
     } catch (error) {
       console.error("Error submitting form:", error.message);
     }
@@ -237,12 +231,12 @@ export default function ExtraDetails() {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error("Something went wrong while submitting.");
-      }
+      const data = await response.json();
 
-      alert("Form submitted successfully");
-      window.location.href = "/classification/extras"; // Or refetch data
+      toast.warn(data[0].message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Submit error:", error.message);
     }

@@ -86,7 +86,7 @@ router.delete('/extras-profile/:id', async (req, res) => {
         return res.status(404).json({ message: 'Itenery not found' });
       }
       res.status(200).json({ 
-        message: 'Itenery deleted successfully', 
+        message: 'EXtras deleted successfully', 
         deleted: deletedItenery 
       });
     } catch (error) {

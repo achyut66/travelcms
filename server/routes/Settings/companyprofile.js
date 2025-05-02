@@ -80,7 +80,7 @@ router.put('/company-profile/:id', upload.single('company_logo'), async (req, re
     }
     const updated = await CompanyProfile.findByIdAndUpdate(id, updateData, { new: true });
     if (!updated) return res.status(404).json({ message: 'Company profile not found' });
-    res.status(200).json(updated);
+    res.status(200).json({message : "Profile Updated Successfully !!!", updated});
   } catch (error) {
     res.status(500).json({ message: 'Error updating company profile', error });
   }

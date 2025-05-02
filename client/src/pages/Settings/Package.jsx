@@ -9,6 +9,7 @@ import { faPlus, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import EButton from "../../components/EditBtn.jsx";
 import DButton from "../../components/DangerBtn.jsx";
 import Breadcrumb from "../../components/Breadscrum.jsx";
+import { toast } from "react-toastify";
 
 export default function NationalitySetting() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -90,10 +91,10 @@ export default function NationalitySetting() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Something went wrong");
-      console.log(res);
-      alert("Form submitted successfully");
-      window.location.href = "/settings/package";
+      toast.success(data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
     } catch (error) {
       console.error("Error submitting form:", error.message);
     }
@@ -111,12 +112,10 @@ export default function NationalitySetting() {
       });
 
       const result = await response.json();
-
-      if (!response.ok)
-        throw new Error(result.message || "Something went wrong");
-
-      alert("Form updated successfully");
-      window.location.href = "/settings/package";
+      toast.warn(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
       setIsEditModalVisible(false);
     } catch (err) {
       console.error("Error updating:", err);
@@ -134,21 +133,25 @@ export default function NationalitySetting() {
       console.error("Failed to fetch data for edit:", error);
     }
   };
+
   const handleDelete = async (id) => {
+    if (!window.confirm("You really want to delete?")) return;
+
     try {
       const res = await fetch(`/api/package-profile/${id}`, {
         method: "DELETE",
       });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete");
-      }
-      alert("Deleted successfully !!!");
-      window.location.reload();
+      const data = await res.json(); // parse the JSON response
+      toast.error(data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     } catch (error) {
+      toast.error(error.message || "Error deleting item");
       console.error("Error deleting purpose:", error);
     }
   };
+
   return (
     <>
       <Layout>
