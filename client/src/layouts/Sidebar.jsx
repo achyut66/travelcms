@@ -18,6 +18,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Clock from "../components/Clock.jsx";
 import { API_BASE_URL } from "../config.js";
+import DashboardNotification from "../components/extras/ToastNotification";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -348,6 +349,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
         }`}
       >
         <Clock />
+        <span>
+          <DashboardNotification />
+        </span>
       </div>
     </>
   );

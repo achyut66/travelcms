@@ -40,7 +40,7 @@ const Header = () => {
       </nav>
 
       <div className="fixed top-0 left-0 w-full mt-[37px] z-80">
-        <ExchangeRateTable />
+        <ExchangeRateTable />{" "}
       </div>
     </>
   );

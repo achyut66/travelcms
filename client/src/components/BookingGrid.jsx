@@ -15,6 +15,7 @@ export default function BookingGrid() {
   const [prevCount, setPrevCount] = useState(0);
   const [shouldBlink, setShouldBlink] = useState(false);
   const [isAssigned, setIsAssigned] = useState([]);
+  const [isAssignedData, setIsAssignedData] = useState([]);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isCanceled, setIsCanceled] = useState(false);
   const [isBooked, setIsBooked] = useState(false);
@@ -53,7 +54,9 @@ export default function BookingGrid() {
     try {
       const res = await fetch("/api/get-assigned-bookings");
       const data = await res.json();
+      // console.log(data);
       setIsAssigned(data.result);
+      setIsAssignedData(data.data);
     } catch (error) {
       console.error("Error fetching assigned booking count:", error.message);
     }
@@ -112,10 +115,9 @@ export default function BookingGrid() {
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
         {/* Bookings Card */}
-        <div className="relative bg-green-300 shadow-md rounded-2xl p-6 transition-transform hover:scale-102">
-          {/* Notification badge */}
+        <div className="relative bg-gray-300 shadow-md  p-6 transition-transform hover:scale-102">
           <div
             className={`absolute top-4 right-4 ${
               shouldBlink ? "animate-blink-shrink" : ""
@@ -127,48 +129,101 @@ export default function BookingGrid() {
             </Link>
           </div>
 
-          {/* Icon */}
           <div className="text-center mb-2">
             <FontAwesomeIcon icon={faCalendarCheck} size="2x" />
           </div>
 
-          {/* Title */}
-          <h3 className="text-xl text-center font-semibold mb-2">Bookings</h3>
+          <h3 className="text-xl text-center font-semibold mb-2">
+            Total Bookings
+          </h3>
 
-          {/* Total count */}
           <div className="text-center text-black font-bold text-2xl">
             <Link to={"/classification/booking"}>{bookingCount}</Link>
           </div>
 
-          {/* 👇 New Inner Task Grid */}
-          <div className="mt-4 grid grid-cols-4 gap-2 text-sm text-center">
-            <div className="bg-gray-600 text-black rounded-md py-2 shadow">
-              <div className="font-semibold text-white">Booked</div>
-              <div className="text-blue-600 text-white text-lg">{isBooked}</div>
-            </div>
-            <div className="bg-yellow-400 text-black rounded-md py-2 shadow">
-              <div className="font-semibold text-white">Assigned</div>
-              <div className="text-blue-600 text-white text-lg">
-                {isAssigned}
+          <div className="mt-4 grid grid-cols-5 gap-2 text-sm text-center ml-[70px]">
+            <div className="relative group">
+              <div
+                className="bg-blue-400 text-black h-12 w-20 flex flex-col items-center justify-center cursor-pointer"
+                style={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.7)" }}
+              >
+                <div className="font-semibold text-white">Booked</div>
+                <div className="text-white text-sm">{isBooked}</div>
+              </div>
+
+              {/* Hover modal */}
+              <div className="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded-md bg-white shadow-lg border p-3 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 z-50">
+                <div className="font-bold mb-1 text-black">Booking Details</div>
+                <p className="text-sm text-gray-600">
+                  "Only Booked – Not Yet Assigned to Pickup, Guide, or Porter"
+                </p>
               </div>
             </div>
-            <div className="bg-green-500 text-black rounded-md py-2 shadow">
-              <div className="font-semibold text-white">Completed</div>
-              <div className="text-green-600 text-white text-lg">
-                {isCompleted}
+
+            <div className="relative group">
+              <div
+                className="bg-yellow-400 text-black h-12 w-20 flex flex-col items-center justify-center"
+                style={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.7)" }}
+              >
+                <div className="font-semibold text-white">Assigned</div>
+                <div className="text-white text-sm">{isAssigned}</div>
+              </div>
+              {/* Hover modal */}
+              <div className="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded-md bg-white shadow-lg border p-3 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 z-50">
+                <div className="font-bold mb-1 text-black">
+                  Assigned Details
+                </div>
+                <p>
+                  "These bookings have been assigned to guides, porters, and are
+                  scheduled for pickup."
+                </p>
               </div>
             </div>
-            <div className="bg-red-400 text-black rounded-md py-2 shadow">
-              <div className="font-semibold text-white">Canceled</div>
-              <div className="text-red-600 text-white text-lg">
-                {isCanceled}
+
+            <div className="relative group">
+              <div
+                className="bg-green-400 text-black h-12 w-20 flex flex-col items-center justify-center"
+                style={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.7)" }}
+              >
+                <div className="font-semibold text-white">Completed</div>
+                <div className="text-white text-sm">{isCompleted}</div>
+              </div>
+              {/* Hover modal */}
+              <div className="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded-md bg-white shadow-lg border p-3 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 z-50">
+                <div className="font-bold mb-1 text-black">
+                  Completed Details
+                </div>
+                <p className="text-sm text-gray-600">
+                  "Completed bookings that have successfully finished all
+                  assigned travel tasks."
+                </p>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <div
+                className="bg-red-500 text-black h-12 w-20 flex flex-col items-center justify-center"
+                style={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.7)" }}
+              >
+                <div className="font-semibold text-white">Canceled</div>
+                <div className="text-white text-sm">{isCanceled}</div>
+              </div>
+              {/* Hover modal */}
+              <div className="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded-md bg-white shadow-lg border p-3 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 z-50">
+                <div className="font-bold mb-1 text-black">
+                  Cancelled Details
+                </div>
+                <p className="text-sm text-gray-600">
+                  "Canceled bookings that were officially withdrawn before task
+                  execution."
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Enquiries Card */}
-        <div className="relative bg-gray-300 shadow-md rounded-2xl p-6 transition-transform hover:scale-102">
+        {/* <div className="relative bg-gray-500 shadow-md p-6 transition-transform hover:scale-102">
           <div className="absolute top-4 right-4">
             <NotificationBadge count={3} />
           </div>
@@ -176,10 +231,10 @@ export default function BookingGrid() {
             <FontAwesomeIcon icon={faInfoCircle} size="2x" />
           </div>
           <h3 className="text-xl text-center font-semibold mb-2">Enquiries</h3>
-        </div>
+        </div> */}
 
         {/* Flights Card */}
-        <div className="relative bg-yellow-200 shadow-md rounded-2xl p-6 transition-transform hover:scale-102">
+        <div className="relative bg-yellow-300 shadow-md p-6 transition-transform hover:scale-102">
           <div className="absolute top-4 right-4">
             <NotificationBadge count={3} />
           </div>

@@ -718,13 +718,17 @@ export default function CompanyProfile() {
         ) : row.flag === 1 ? (
           <span
             className="bg-yellow-200 p-3"
-            title="Tasks assidgned to guides/porter."
+            title="Tasks assigned to guides/porter."
           >
             "Assigned"
           </span>
         ) : row.flag === 2 ? (
           <span className="bg-green-500 p-3" title="This task is completed">
             "Completed"
+          </span>
+        ) : row.flag === 4 ? (
+          <span className="bg-gray-300 p-3" title="Sent Person To Pick-Up">
+            "Picking-Up"
           </span>
         ) : row.flag === 3 ? (
           <span
@@ -925,7 +929,7 @@ export default function CompanyProfile() {
           label={<FontAwesomeIcon icon={faPen} />}
           onClick={() => handleEdit(row._id)}
           tooltip="Edit Booking"
-          disabled={row.flag === 2}
+          disabled={[2, 3].includes(row.flag)}
         />
         &nbsp;
         <DButton
@@ -933,7 +937,7 @@ export default function CompanyProfile() {
           label={<FontAwesomeIcon icon={faTimes} />}
           onClick={() => openCancelModal(row._id)}
           tooltip="Cancel Booking"
-          disabled={row.flag === 2}
+          disabled={[2, 3].includes(row.flag)}
         />
         &nbsp;
         <PUButton
@@ -941,7 +945,7 @@ export default function CompanyProfile() {
           label={<FontAwesomeIcon icon={faClipboardList} />}
           onClick={() => handleAccess(row._id)}
           tooltip="Assign Task To"
-          disabled={row.flag === 2}
+          disabled={[2, 3].includes(row.flag)}
         />
         &nbsp;
         <Button
@@ -949,7 +953,7 @@ export default function CompanyProfile() {
           label={<FontAwesomeIcon icon={faTruckPickup} />}
           onClick={() => openPickUpModal(row._id)}
           tooltip="Assign Pickup"
-          disabled={row.flag === 2}
+          disabled={[2, 3].includes(row.flag)}
         />
         &nbsp;
         <SButton
@@ -957,7 +961,7 @@ export default function CompanyProfile() {
           label={<FontAwesomeIcon icon={faCheckCircle} />}
           onClick={() => openCompleteModal(row._id)}
           tooltip="Is Booking Completed?"
-          disabled={row.flag === 2}
+          disabled={[2, 3].includes(row.flag)}
         />
         &nbsp;
         {row.flag === 2 ? (

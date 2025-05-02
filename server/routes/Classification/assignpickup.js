@@ -3,6 +3,7 @@ const router = express.Router();
 import pickupAssignProfile from '../../models/Classification/AssignPickUp.js';  // Import your model
 import bookingCompleteProfile from '../../models/Classification/BookingComplete.js';  // Import your model
 import bookingCancelProfile from '../../models/Classification/BookingCancel.js';  // Import your model
+import BookingProfile from '../../models/Classification/Booking.js';
 
 // Define the route to handle the POST request
 router.post("/pickup-register", async (req, res) => {
@@ -33,6 +34,13 @@ router.post("/pickup-register", async (req, res) => {
         vehicle_charge
       });
       await bookingComplete.save();
+
+      const bookingdata = await BookingProfile.findById(booking_id);
+      if (bookingdata) {
+      bookingdata.flag = 4;
+      await bookingdata.save();
+      }
+
       return res.status(200).json({ message: "Pickup Assigned Successfully." });
     } catch (err) {
       console.error("Error saving pickup assignment:", err);

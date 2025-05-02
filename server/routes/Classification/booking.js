@@ -127,6 +127,7 @@ router.post('/booking-register', upload.fields([
     res.status(500).json({ message: 'Failed to register booking', error: err.message });
   }
 });
+
 router.get('/get-booking-details', async (req, res) => {
   try {
     const data = await BookingProfile.find(); // fetches all bookings
@@ -135,7 +136,7 @@ router.get('/get-booking-details', async (req, res) => {
     console.error("Fetch Error:", error.message);
     res.status(500).json({ message: "Error fetching data" });
   }
-  });
+});
 
 router.put(
   "/update-booking-and-traveller/:id",
@@ -283,8 +284,8 @@ router.get('/get-booking-by-month', async (req, res) => {
 
 router.get('/get-assigned-bookings', async (req, res) => {
   try {
-    const result = await BookingProfile.countDocuments({ flag: 1 });
-    const data = await BookingProfile.find({ flag: 1 });
+    const result = await BookingProfile.countDocuments({ flag: { $in: [1, 4] } });
+    const data = await BookingProfile.find({ flag: { $in: [1, 4] } });
     res.json({ result, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -389,6 +390,40 @@ router.get("/get-isassigned-booking", async (req, res) => {
 //     res.status(500).json({ message: "Error fetching data" });
 //   }
 // });
+
+router.get("/getdata-with-pickupdate", async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfDay = new Date(now.setHours(0, 0, 0, 0)); 
+    const formattedDate = startOfDay.toISOString().slice(0, 10);
+
+    const twoDaysLater = new Date(startOfDay.getTime() + 2 * 24 * 60 * 60 * 1000); 
+    twoDaysLater.setHours(0, 0, 0, 0); 
+    const formattedTwoDaysLater = twoDaysLater.toISOString().slice(0, 10); 
+
+    const response = await BookingProfile.find({
+      pickup_date: {
+        $gte: formattedDate,       
+        $lte: formattedTwoDaysLater   
+      },
+      flag: { $ne: 4 }
+    });
+    const count = await BookingProfile.countDocuments({
+      pickup_date: {
+        $gte: formattedDate,       
+        $lte: formattedTwoDaysLater   
+      },
+      flag: { $ne: 4 }
+    });
+    res.json({
+      count: count,
+      data: response
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ message: "Error fetching data" });
+  }
+});
 
 
 
