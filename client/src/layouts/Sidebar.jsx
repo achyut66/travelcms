@@ -149,7 +149,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
               {isBookingDropdownOpen && (
                 <ul className="ml-3 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
-                  <hr className="border-sm text-gray-400" />
                   <Link to={"/classification/booking"}>
                     <li className="hover:text-blue-600 cursor-pointer mb-[7px]">
                       <FontAwesomeIcon icon={faCubes} /> &nbsp;&nbsp;Package
@@ -173,11 +172,15 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
               )}
 
               <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faDollarSign} /> &nbsp;Extras
+                <Link to={"/classification/extras"}>
+                  <FontAwesomeIcon icon={faDollarSign} /> &nbsp;&nbsp;Extras
+                </Link>
               </li>
 
               <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faRoute} /> &nbsp;Itinerary
+                <Link to={"/classification/itinery"}>
+                  <FontAwesomeIcon icon={faRoute} /> &nbsp;&nbsp;Itinerary
+                </Link>
               </li>
             </ul>
           )}
