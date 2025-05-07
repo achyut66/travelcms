@@ -165,8 +165,6 @@ const ReceiptViewModal = ({ visible, onClose, row = {}, receiptData }) => {
     printWindow.close();
   };
 
-  // print submit form
-  // useEffect(() => {
   const handlePrintSubmit = async () => {
     try {
       const payload = {

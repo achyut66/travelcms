@@ -13,6 +13,7 @@ import {
   faBus,
   faDollarSign,
   faPlane,
+  faCubes,
   faRocket,
   faFile,
 } from "@fortawesome/free-solid-svg-icons";
@@ -22,6 +23,7 @@ import DashboardNotification from "../components/extras/ToastNotification";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isBookingDropdownOpen, setIsBookingDropdownOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [profileData, setProfileData] = useState([]);
@@ -122,90 +124,74 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             className="hover:text-gray-400 cursor-pointer flex justify-between items-center"
           >
             <div className="flex items-center gap-2">
-              <div
-                className={`flex items-center transition-all duration-300 ${
-                  isSidebarOpen ? "justify-start" : "justify-center pr-5"
-                }`}
-              >
-                <FontAwesomeIcon
-                  icon={faRocket}
-                  className={`transition-all duration-300 ${
-                    isSidebarOpen ? "text-xl" : "text-[30px]"
-                  }`}
-                />
-              </div>
+              <FontAwesomeIcon
+                icon={faRocket}
+                className={isSidebarOpen ? "text-xl" : "text-[30px]"}
+              />
               {isSidebarOpen && <span>Modules/Features</span>}
             </div>
             {isSidebarOpen && <span>{isDropdownOpen ? "▲" : "▼"}</span>}
           </li>
 
           {isDropdownOpen && isSidebarOpen && (
-            <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
-              <li className="hover:text-blue-600 cursor-pointer">
-                <Link to={"/classification/booking"}>
-                  <FontAwesomeIcon icon={faClipboardList} /> &nbsp;&nbsp;Booking
-                </Link>
+            <ul className="ml-4 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
+              {/* Booking Details */}
+              <li
+                onClick={() => setIsBookingDropdownOpen(!isBookingDropdownOpen)}
+                className="hover:text-blue-600 cursor-pointer flex justify-between items-center"
+              >
+                <div className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faClipboardList} />
+                  <span>Booking Details</span>
+                </div>
+                <span>{isBookingDropdownOpen ? "▲" : "▼"}</span>
               </li>
-              {/* <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faUser} /> &nbsp;&nbsp;Customer
-              </li> */}
-              {/* <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faLocationArrow} />{" "}
-                &nbsp;&nbsp;Destination
+
+              {isBookingDropdownOpen && (
+                <ul className="ml-3 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
+                  <hr className="border-sm text-gray-400" />
+                  <Link to={"/classification/booking"}>
+                    <li className="hover:text-blue-600 cursor-pointer mb-[7px]">
+                      <FontAwesomeIcon icon={faCubes} /> &nbsp;&nbsp;Package
+                    </li>
+                  </Link>
+                  <hr className="border-sm text-gray-400" />
+                  <Link to={"/classification/booking"}>
+                    <li className="hover:text-blue-600 cursor-pointer mb-[7px]">
+                      <FontAwesomeIcon icon={faPlane} /> &nbsp;&nbsp;Flight
+                    </li>
+                  </Link>
+                  <hr className="border-sm text-gray-400" />
+                  <Link to={"/classification/booking"}>
+                    <li className="hover:text-blue-600 cursor-pointer">
+                      <FontAwesomeIcon icon={faBus} />{" "}
+                      &nbsp;&nbsp;Transportation
+                    </li>
+                  </Link>
+                  <hr className="border-sm text-gray-400 mt-2" />
+                </ul>
+              )}
+
+              <li className="hover:text-blue-600 cursor-pointer">
+                <FontAwesomeIcon icon={faDollarSign} /> &nbsp;Extras
               </li>
+
               <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faBus} /> &nbsp;&nbsp;Transportation
-              </li> */}
-              <li className="hover:text-blue-600 cursor-pointer">
-                <Link to={"/classification/extras"}>
-                  <FontAwesomeIcon icon={faDollarSign} /> &nbsp;&nbsp;Extras
-                </Link>
-              </li>
-              {/* <li className="hover:text-blue-600 cursor-pointer">
-                <FontAwesomeIcon icon={faPlane} /> &nbsp;&nbsp;Flights
-              </li> */}
-              <li className="hover:text-blue-600 cursor-pointer">
-                <Link to={"/classification/itinery"}>
-                  <FontAwesomeIcon icon={faRoute} /> &nbsp;&nbsp;Itinerary
-                </Link>
+                <FontAwesomeIcon icon={faRoute} /> &nbsp;Itinerary
               </li>
             </ul>
           )}
 
-          {/* <li className="hover:text-gray-400 cursor-pointer flex items-center">
-            <div
-              className={`flex items-center transition-all duration-300 ${
-                isSidebarOpen ? "justify-start" : "justify-center pr-5"
-              }`}
-            >
-              <FontAwesomeIcon
-                icon={faHome}
-                className={`transition-all duration-300 ${
-                  isSidebarOpen ? "text-xl" : "text-[30px]"
-                }`}
-              />
-            </div>
-
-            {isSidebarOpen && <span className="ml-2">Blog</span>}
-          </li> */}
-
+          {/* Reports */}
           <li
             onClick={() => setIsReportOpen(!isReportOpen)}
             className="hover:text-gray-400 cursor-pointer flex justify-between items-center"
           >
             <div className="flex items-center gap-2">
-              <div
-                className={`flex items-center transition-all duration-300 ${
-                  isSidebarOpen ? "justify-start" : "justify-center pr-5"
-                }`}
-              >
-                <FontAwesomeIcon
-                  icon={faFile}
-                  className={`transition-all duration-300 ${
-                    isSidebarOpen ? "text-xl" : "text-[30px]"
-                  }`}
-                />
-              </div>
+              <FontAwesomeIcon
+                icon={faFile}
+                className={isSidebarOpen ? "text-xl" : "text-[30px]"}
+              />
               {isSidebarOpen && <span>Reports</span>}
             </div>
             {isSidebarOpen && <span>{isReportOpen ? "▲" : "▼"}</span>}
