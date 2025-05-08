@@ -28,6 +28,7 @@ import Itenerary from "./pages/Classification/Itenerary/Itinery";
 import ExtraDetails from "./pages/Classification/Extras/ExtraDetails";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import FlightBookingInfo from "./pages/Classification/FlightBooking";
 
 // reports package
 import BookingReport from "./pages/report/BookingReport";
@@ -78,6 +79,10 @@ export default function App() {
         <Route path="/report/booking" element={<BookingReport />} />
         <Route path="/classification/itinery" element={<Itenerary />} />
         <Route path="/classification/extras" element={<ExtraDetails />} />
+        <Route
+          path="/classification/booking/flight"
+          element={<FlightBookingInfo />}
+        />
       </Routes>
     </>
   );

@@ -155,7 +155,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                     </li>
                   </Link>
                   <hr className="border-sm text-gray-400" />
-                  <Link to={"/classification/booking"}>
+                  <Link to={"/classification/booking/flight"}>
                     <li className="hover:text-blue-600 cursor-pointer mb-[7px]">
                       <FontAwesomeIcon icon={faPlane} /> &nbsp;&nbsp;Flight
                     </li>

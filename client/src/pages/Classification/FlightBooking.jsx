@@ -4,7 +4,7 @@ import RButton from "../../components/ReceiptBtn.jsx";
 import Layout from "../../layouts/Layout.jsx";
 import DynamicModal from "../../components/GridModal.jsx";
 import DynamicEditModal from "../../components/EditGridModal.jsx";
-import ViewModal from "../../components/GridViewModal.jsx";
+import ViewModal from "../../components/GridFlightViewModal.jsx";
 import ReceiptViewModal from "../../components/ReceiptModal.jsx";
 import Table from "../../components/Table.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,10 +13,8 @@ import {
   faPlus,
   faPen,
   faHome,
-  faClipboardList,
   faTimes,
   faCheckCircle,
-  faTruckPickup,
   faReceipt,
   // faSmile,
 } from "@fortawesome/free-solid-svg-icons";
@@ -32,18 +30,13 @@ import BookingCancelModal from "../../components/Modal.jsx";
 import PickUpModal from "../../components/Modal.jsx";
 import { toast } from "react-toastify";
 
-export default function CompanyProfile() {
+export default function FlightBookingInfo() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
-  const [isAccessModalVisible, setIsAccessModalVisible] = useState(false);
 
   const [isCompleteModalVisible, setIsCompleteModalVisible] = useState(false);
-  const [isPickUpModalVisible, setIsPickUpModalVisible] = useState(false);
   const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
-
-  const [dataWithPotter, setdataWithPotter] = useState(null); // to hold fetched data
-  const [isVehicleUsed, setIsVehicleUsed] = useState([]);
 
   const [packageData, setPackageData] = useState([]);
   const [paymentMethodData, setPaymentMethodData] = useState([]);
@@ -66,7 +59,6 @@ export default function CompanyProfile() {
   // if booking is completed
   const [ifComplete, setIfComplete] = useState("");
 
-  const [potterData, setPotterData] = useState([]);
   const [isReceiptModalVisible, setIsReceiptModalVisible] = useState(false);
 
   // package state
@@ -126,7 +118,7 @@ export default function CompanyProfile() {
   };
   const getBookingData = async () => {
     try {
-      const response = await fetch("/api/get-booking-details");
+      const response = await fetch("/api/get-flight-booking-details");
       if (!response.ok) {
         throw new Error("Failed to fetch booking details");
       }
@@ -141,25 +133,6 @@ export default function CompanyProfile() {
       setLoading(false);
     }
   };
-  const getPotterData = async () => {
-    try {
-      const response = await fetch("/api/guide-data");
-      const data = await response.json();
-      setPotterData(data);
-    } catch (error) {
-      console.error("Error fetching potter data:", error.message);
-    }
-  };
-  // console.log(isVehicleUsed);
-  const getVehicleUsed = async () => {
-    try {
-      const response = await fetch("/api/vehicle-data");
-      const data = await response.json();
-      setIsVehicleUsed(data);
-    } catch (error) {
-      console.error("Error fetching vehicle used data:", error.message);
-    }
-  };
 
   useEffect(() => {
     getPackageData();
@@ -169,103 +142,107 @@ export default function CompanyProfile() {
     getNationalityData();
     getLanguageData();
     getBookingData();
-    getPotterData();
-    getVehicleUsed();
   }, []);
 
   // Handling submit form
   const fields = [
     {
-      h2Title: "Customer Information",
+      h2Title: "Flight Information",
     },
     {
       name: "company_name",
-      label: "Company Name",
+      label: "Company / Person Name",
       type: "text",
       required: true,
       defaultValue: "",
     },
     {
-      name: "company_address",
-      label: "Address",
+      name: "dept_airport",
+      label: "Departure Airport",
+      type: "text",
+      required: true,
+      defaultValue: "",
+    },
+    {
+      name: "arrv_airport",
+      label: "Arrival Airport",
       required: true,
       type: "text",
       defaultValue: "",
     },
     {
-      name: "contact_person",
-      label: "Contact Person",
-      required: true,
-      type: "text",
-      defaultValue: "",
-    },
-    {
-      name: "contact_number",
-      label: "Contact Number",
-      required: true,
-      type: "text",
-      defaultValue: "",
-    },
-    {
-      name: "contact_email",
-      label: "Contact Email",
-      type: "text",
-      defaultValue: "",
-    },
-
-    // travel details
-    {
-      h2Title: "Travel Details",
-    },
-    {
-      name: "package_name",
-      label: "Package Name",
-      required: true,
-      type: "select2",
-      options: packageData.map((pck) => ({
-        value: pck.package,
-        label: pck.package,
-      })),
-      defaultValue: "",
-    },
-    {
-      name: "departure_date",
+      name: "dept_date",
       label: "Departure Date",
       required: true,
       type: "date",
       defaultValue: "",
     },
     {
+      name: "dept_time",
+      label: "Departure Time",
+      required: true,
+      type: "time",
+      defaultValue: "",
+    },
+    {
       name: "return_date",
       label: "Return Date",
+      type: "date",
+      defaultValue: "",
+    },
+    {
+      name: "return_time",
+      label: "Return Time",
+      type: "time",
+      defaultValue: "",
+    },
+    {
+      name: "flight_no",
+      label: "Flight Number",
+      type: "text",
+      defaultValue: "",
+    },
+    {
+      name: "service_class",
+      label: "Service Class",
+      type: "select2",
       required: true,
-      type: "date",
+      options: [
+        { label: "Business", value: "Business" },
+        { label: "Economy", value: "Economy" },
+      ],
+      defaultValue: "",
+    },
+
+    // baggage information
+    {
+      h2Title: "Baggage Information",
+    },
+    {
+      name: "no_of_checked_baggage",
+      label: "Checked Baggage",
+      type: "number",
       defaultValue: "",
     },
     {
-      name: "pickup_location",
-      label: "Pick-Up Location",
-      type: "text",
+      name: "baggage_weight",
+      label: "Weight",
+      type: "number",
       defaultValue: "",
     },
     {
-      name: "pickup_date",
-      label: "Pick-Up Date",
-      type: "date",
+      name: "additional_baggage",
+      label: "Additional Baggage",
+      type: "number",
       defaultValue: "",
     },
-    {
-      name: "drop_location",
-      label: "Drop Location",
-      type: "text",
-      defaultValue: "",
-    },
+
     // Payment information
     {
       h2Title: "Payment Information",
     },
     {
-      name: "method",
+      name: "payment_method",
       label: "Method Of Payment",
       required: true,
       type: "select2",
@@ -276,87 +253,29 @@ export default function CompanyProfile() {
       defaultValue: "",
     },
     {
-      name: "promo_code",
-      label: "Promo Code",
+      name: "billing_address",
+      label: "Billing Address",
       type: "text",
-      defaultValue: "",
-    },
-    {
-      name: "payment_status",
-      label: "Payment Status",
-      type: "select2",
-      options: paymentStatusData.map((pcks) => ({
-        value: pcks.status,
-        label: pcks.status,
-      })),
       defaultValue: "",
     },
 
+    // additional service
     {
-      name: "invoice_receipt",
-      label: "Invoice Receipt",
-      type: "file",
-      defaultValue: "",
-    },
-    // internation flight details
-    {
-      h2Title: "International Flight Details",
+      h2Title: "Additional Details",
     },
     {
-      name: "airlines_name",
-      label: "Airlines Name",
+      name: "insurance",
+      label: "Insurance",
       type: "text",
       defaultValue: "",
     },
     {
-      name: "flight_taken_date",
-      label: "Date",
-      type: "date",
-      defaultValue: "",
-    },
-    {
-      name: "flight_number",
-      label: "Flight Number",
+      name: "special_assist",
+      label: "Special Assistant",
       type: "text",
       defaultValue: "",
     },
-    {
-      name: "flight_time",
-      label: "Flight Time",
-      type: "text",
-      defaultValue: "",
-    },
-    // option fields
-    {
-      h2Title: "Optional Information",
-    },
-    {
-      name: "special_instruction",
-      label: "Special Instruction",
-      type: "text",
-      defaultValue: "",
-    },
-    {
-      name: "preferred_language",
-      label: "Prefered Language",
-      type: "select2",
-      options: languageData.map((pcks) => ({
-        value: pcks.language,
-        label: pcks.language,
-      })),
-      defaultValue: "",
-    },
-    {
-      name: "purpose",
-      label: "Purpose Of Visit",
-      required: true,
-      type: "select2",
-      options: purposeData.map((pcks) => ({
-        value: pcks.purpose,
-        label: pcks.purpose,
-      })),
-      defaultValue: "",
-    },
+
     // traveller
     {
       h2Title: "Traveller Details",
@@ -372,22 +291,40 @@ export default function CompanyProfile() {
     {
       extraFields: [
         {
-          name: "traveller_name[]",
+          name: "full_name[]",
           type: "text",
-          label: "Traveller Name",
+          label: "Full Name",
           required: true,
           defaultValue: "",
         },
         {
-          name: "special_request[]",
-          type: "text",
-          label: "Special Request",
+          name: "dob[]",
+          type: "date",
+          label: "DOB",
+          defaultValue: "",
+        },
+        {
+          name: "gender[]",
+          label: "Gender",
+          required: true,
+          type: "select2",
+          options: [
+            { value: "Male", label: "Male" },
+            { value: "Female", label: "Female" },
+            { value: "Others", label: "Others" },
+          ],
+          defaultValue: "",
+        },
+        {
+          name: "passport_no[]",
+          label: "Passport Number",
+          required: true,
+          type: "number",
           defaultValue: "",
         },
         {
           name: "nationality[]",
           label: "Nationality",
-          required: true,
           type: "select2",
           options: nationalityData.map((pcks) => ({
             value: pcks.nationality,
@@ -396,37 +333,60 @@ export default function CompanyProfile() {
           defaultValue: "",
         },
         {
-          name: "passport_number[]",
-          label: "Passport Number",
-          required: true,
-          type: "number",
+          name: "contact_no[]",
+          label: "Contact Number",
+          type: "text",
           defaultValue: "",
         },
         {
-          name: "visa_copies[]",
-          label: "Visa Copies",
-          type: "file",
+          name: "email[]",
+          label: "Email",
+          type: "text",
+          defaultValue: "",
+        },
+        {
+          name: "special_req[]",
+          label: "Special Request",
+          type: "text",
           defaultValue: "",
         },
       ],
       extraEditFields: [
         {
-          name: "traveller_name",
+          name: "full_name",
           type: "text",
-          label: "Traveller Name",
+          label: "Full Name",
           required: true,
           defaultValue: "",
         },
         {
-          name: "special_request",
-          type: "text",
-          label: "Special Request",
+          name: "dob",
+          type: "date",
+          label: "DOB",
+          defaultValue: "",
+        },
+        {
+          name: "gender",
+          label: "Gender",
+          required: true,
+          type: "select2",
+          options: [
+            { value: "Male", label: "Male" },
+            { value: "Female", label: "Female" },
+            { value: "Others", label: "Others" },
+          ],
+          defaultValue: "",
+        },
+        {
+          name: "passport_no",
+          label: "Passport Number",
+          required: true,
+          type: "number",
           defaultValue: "",
         },
         {
           name: "nationality",
           label: "Nationality",
-          required: true,
           type: "select2",
           options: nationalityData.map((pcks) => ({
             value: pcks.nationality,
@@ -435,48 +395,27 @@ export default function CompanyProfile() {
           defaultValue: "",
         },
         {
-          name: "passport_number",
-          label: "Passport Number",
-          required: true,
-          type: "number",
+          name: "contact_no",
+          label: "Contact Number",
+          type: "text",
           defaultValue: "",
         },
         {
-          name: "visa_copies",
-          label: "Visa Copies",
-          type: "file",
+          name: "email",
+          label: "Email",
+          type: "text",
+          defaultValue: "",
+        },
+        {
+          name: "special_req",
+          label: "Special Request",
+          type: "text",
           defaultValue: "",
         },
       ],
     },
-    // itenery details
-    // {
-    //   h2Title: "Itenery Details",
-    // },
-    // {
-    //   name: "pax_no",
-    //   label: "No of PAX",
-    //   required: true,
-    //   type: "number",
-    //   isNote: true,
-    //   defaultValue: "",
-    // },
   ];
 
-  // handling access
-  const fieldsAccess = [
-    {
-      name: "assistants_name",
-      label: "Guide / Porter Name",
-      type: "select2",
-      required: true,
-      multiple: true,
-      options: potterData.map((pck) => ({
-        value: pck.contact_name,
-        label: pck.contact_name,
-      })),
-    },
-  ];
   // handling is completed
   const fieldsComplete = [
     {
@@ -500,48 +439,7 @@ export default function CompanyProfile() {
     //   defaultValue: "",
     // },
   ];
-  // pickup field
-  const fieldsPickup = [
-    {
-      name: "pickup_date",
-      label: "Pick-Up Date",
-      type: "date",
-      required: true,
-      defaultValue: "",
-    },
-    {
-      name: "assigned_person",
-      label: "Name of Assigned Person",
-      type: "select2",
-      required: true,
-      options: potterData.map((pck) => ({
-        value: pck.contact_name,
-        label: pck.contact_name,
-      })),
-    },
-    {
-      name: "pickup_time",
-      label: "Pick-Up Time",
-      type: "time",
-      defaultValue: "",
-    },
-    {
-      name: "vehicle_used",
-      label: "Name of Vehicle Used",
-      type: "select2",
-      required: true,
-      options: isVehicleUsed.map((pck) => ({
-        value: pck.vehicle_type,
-        label: pck.vehicle_type,
-      })),
-    },
-    {
-      name: "vehicle_charge",
-      label: "Vehicle Charge",
-      type: "string",
-      defaultValue: "",
-    },
-  ];
+
   // cancel feild
   const fieldsCancel = [
     {
@@ -557,7 +455,7 @@ export default function CompanyProfile() {
   const handleModalSubmit = async (formData) => {
     try {
       const formPayload = new FormData();
-      // console.log("Full formData before processing:", formData);
+      console.log(formData);
       const excludedTravellerKeys = ["pax_details"];
       Object.entries(formData).forEach(([key, value]) => {
         if (!excludedTravellerKeys.includes(key)) {
@@ -576,28 +474,29 @@ export default function CompanyProfile() {
 
       travellers.forEach((traveller, index) => {
         const {
-          "traveller_name[]": name,
+          "full_name[]": name,
+          "dob[]": dob,
+          "gender[]": gender,
           "nationality[]": nationality,
-          "passport_number[]": passport,
-          "special_request[]": request,
-          "visa_copies[]": visaCopy,
+          "passport_no[]": passport,
+          "contact_no[]": contact,
+          "special_req[]": request,
         } = traveller;
 
-        if (!name || !nationality || !passport) {
+        if (!name || !passport) {
           throw new Error(`Traveller ${index + 1} is missing required fields.`);
         }
 
-        formPayload.append("traveller_name[]", name);
+        formPayload.append("full_name[]", name);
+        formPayload.append("dob[]", dob || "");
+        formPayload.append("gender[]", gender || "");
         formPayload.append("nationality[]", nationality);
-        formPayload.append("passport_number[]", passport);
-        formPayload.append("special_request[]", request || "");
-
-        if (visaCopy && visaCopy instanceof File) {
-          formPayload.append("visa_copies[]", visaCopy);
-        }
+        formPayload.append("passport_no[]", passport);
+        formPayload.append("contact_no[]", contact || "");
+        formPayload.append("special_req[]", request || "");
       });
 
-      const response = await fetch("/api/booking-register", {
+      const response = await fetch("/api/flight-register", {
         method: "POST",
         body: formPayload,
       });
@@ -612,11 +511,11 @@ export default function CompanyProfile() {
       alert("Error: " + error.message);
     }
   };
+
   // handle edit modal submit
   const handleEditModalSubmit = async (formData) => {
     try {
       const formPayload = new FormData();
-
       Object.entries(formData).forEach(([key, value]) => {
         if (key !== "invoice_receipt" && key !== "pax_details") {
           formPayload.append(key, value);
@@ -641,7 +540,7 @@ export default function CompanyProfile() {
       // console.log(formData);
       // Send request to the server
       const response = await fetch(
-        `/api/update-booking-and-traveller/${selectedId}`,
+        `/api/update-flight-booking-and-traveller/${selectedId}`,
         {
           method: "PUT",
           body: formPayload,
@@ -659,52 +558,15 @@ export default function CompanyProfile() {
       alert("Error: " + error.message);
     }
   };
-  // handle access submit
-  const handleAccessModalSubmit = async (formData, bookingId) => {
-    try {
-      const assistants = formData.assistants_name;
-
-      if (!Array.isArray(assistants)) {
-        throw new Error("assistants_name must be an array");
-      }
-
-      const responses = await Promise.all(
-        assistants.map(async (name) => {
-          const payload = {
-            assistants_name: name,
-            booking_id: bookingId,
-          };
-          const response = await fetch("/api/assistant-register", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          });
-
-          const result = await response.json();
-          if (!response.ok)
-            throw new Error(result.message || "Submission failed");
-          return result;
-        })
-      );
-      toast.success(responses[0]?.message || "All assistants added");
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
 
   // table to display data
   const columns = [
     { key: "index", label: "S.no" },
     { key: "company_name", label: "Company Name" },
-    { key: "contact_person", label: "Contact Person" },
-    { key: "contact_number", label: "Contact Number" },
-    { key: "package_name", label: "Package Name" },
-    { key: "departure_date", label: "Departure Date" },
+    { key: "dept_airport", label: "Departure Airport" },
+    { key: "arrv_airport", label: "Arrival Airport" },
+    { key: "service_class", label: "Service Class" },
+    { key: "dept_date", label: "Departure Date" },
     { key: "return_date", label: "Return Date" },
     { key: "pax_no", label: "Pax No" },
     {
@@ -746,7 +608,7 @@ export default function CompanyProfile() {
   const handleView = async (id) => {
     setSelectedId(id);
     try {
-      const res = await fetch(`/api/get-booking-with-travellers/${id}`);
+      const res = await fetch(`/api/get-flightbooking-with-travellers/${id}`);
       const data = await res.json();
       setViewFormData(data.data); // Set the fetched data
       setTravellerData(data.data.travellers);
@@ -779,7 +641,7 @@ export default function CompanyProfile() {
   const handleEdit = async (id) => {
     setSelectedId(id);
     try {
-      const res = await fetch(`/api/get-booking-with-travellers/${id}`);
+      const res = await fetch(`/api/get-flightbooking-with-travellers/${id}`);
       const result = await res.json();
       if (!res.ok)
         throw new Error(result.message || "Failed to fetch edit data");
@@ -792,27 +654,9 @@ export default function CompanyProfile() {
     }
   };
 
-  const handleAccess = async (id) => {
-    setSelectedId(id);
-    try {
-      const res = await fetch(`/api/get-booking-with-travellers/${id}`);
-      const result = await res.json();
-      setdataWithPotter(result.data);
-      setIsAccessModalVisible(true);
-    } catch (error) {
-      console.error("Edit fetch error:", error);
-      alert("Error fetching edit data: " + error.message);
-    }
-  };
-
   const openCompleteModal = (id) => {
     setSelectedId(id);
     setIsCompleteModalVisible(true);
-  };
-
-  const openPickUpModal = (id) => {
-    setSelectedId(id);
-    setIsPickUpModalVisible(true);
   };
 
   const handleComplete = async (id, formData) => {
@@ -871,34 +715,6 @@ export default function CompanyProfile() {
     }
   };
 
-  const handlePickUp = async (id, formData) => {
-    // console.log(formData);
-    try {
-      const res = await fetch("/api/pickup-register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          booking_id: id,
-          pickup_date: formData.pickup_date,
-          assigned_person: formData.assigned_person,
-          pickup_time: formData.pickup_time,
-          vehicle_used: formData.vehicle_used,
-          vehicle_charge: formData.vehicle_charge,
-        }),
-      });
-      const result = await res.json();
-      toast.success(result.message);
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    } catch (error) {
-      console.error("Error completing booking:", error);
-      alert(error.message);
-    }
-  };
-
   useEffect(() => {
     const fetchIfCompleteOnly = async () => {
       try {
@@ -941,22 +757,6 @@ export default function CompanyProfile() {
           disabled={[2, 3].includes(row.flag)}
         />
         &nbsp;
-        <PUButton
-          className="text-gray-500"
-          label={<FontAwesomeIcon icon={faClipboardList} />}
-          onClick={() => handleAccess(row._id)}
-          tooltip="Assign Task To"
-          disabled={[2, 3].includes(row.flag)}
-        />
-        &nbsp;
-        <Button
-          className="text-green-red-500"
-          label={<FontAwesomeIcon icon={faTruckPickup} />}
-          onClick={() => openPickUpModal(row._id)}
-          tooltip="Assign Pickup"
-          disabled={[2, 3].includes(row.flag)}
-        />
-        &nbsp;
         <SButton
           className="text-green-500"
           label={<FontAwesomeIcon icon={faCheckCircle} />}
@@ -978,42 +778,30 @@ export default function CompanyProfile() {
   };
   const displayColumns = [
     {
-      section: "Customer Information",
+      section: "Flight Information",
       fields: [
         "company_name",
-        "company_address",
-        "contact_person",
-        "contact_number",
-        "contact_email",
+        "dept_airport",
+        "arrv_airport",
+        "dept_date",
+        "dept_time",
+        "return_date",
+        "return_time",
+        "flight_no",
+        "service_class",
       ],
     },
     {
-      section: "Travel Details",
-      fields: [
-        "package_name",
-        "departure_date",
-        "return_date",
-        "pickup_location",
-        "drop_location",
-        "pickup_date",
-      ],
+      section: "Baggage Information",
+      fields: ["no_of_checked_baggage", "baggage_weight", "additional_baggage"],
     },
     {
       section: "Payment Information",
-      fields: ["method", "promo_code", "payment_status", "invoice_receipt"],
+      fields: ["payment_method", "billing_address"],
     },
     {
-      section: "International Flight Details",
-      fields: [
-        "airlines_name",
-        "flight_taken_date",
-        "flight_time",
-        "flight_number",
-      ],
-    },
-    {
-      section: "Optional Information",
-      fields: ["special_instruction", "preferred_language", "purpose"],
+      section: "Additional Details",
+      fields: ["insurance", "special_assist"],
     },
     {
       section: "Traveller Details",
@@ -1062,14 +850,14 @@ export default function CompanyProfile() {
         <DynamicModal
           visible={isModalVisible}
           onClose={() => setIsModalVisible(false)}
-          title="Booking Information"
+          title="Flight Booking Information"
           fields={fields}
           onSubmit={handleModalSubmit}
         />
         <DynamicEditModal
           visible={isEditModalVisible}
           onClose={() => setIsEditModalVisible(false)}
-          title="Edit Booking Information"
+          title="Edit Flight Booking Information"
           fields={fields}
           defaultValues={editFormData}
           defaultTravellerdata={editTravellerData}
@@ -1085,18 +873,10 @@ export default function CompanyProfile() {
           displayColumns={displayColumns}
         />
 
-        <DynamicAccessModal
-          visible={isAccessModalVisible}
-          onClose={() => setIsAccessModalVisible(false)}
-          title="Assign Task To"
-          fields={fieldsAccess}
-          onSubmit={handleAccessModalSubmit}
-          bookingId={selectedId}
-        />
         <BookingCancelModal
           visible={isCancelModalVisible}
           onClose={() => setIsCancelModalVisible(false)}
-          title="Cancel Booking"
+          title="Cancel Flight Booking"
           fields={fieldsCancel} // Assuming this has a "cancel_reason" input
           onSubmit={(formData) => {
             handleCancel(selectedId, formData);
@@ -1106,19 +886,10 @@ export default function CompanyProfile() {
         <BookingCompleteModal
           visible={isCompleteModalVisible}
           onClose={() => setIsCompleteModalVisible(false)}
-          title="Booking Completed"
+          title="Flight Booking Completed"
           fields={fieldsComplete}
           onSubmit={(formData) => {
             handleComplete(selectedId, formData); // Submit form from modal
-          }}
-        />
-        <PickUpModal
-          visible={isPickUpModalVisible}
-          onClose={() => setIsPickUpModalVisible(false)}
-          title="Pick-Up Information"
-          fields={fieldsPickup}
-          onSubmit={(formData) => {
-            handlePickUp(selectedId, formData); // Submit form from modal
           }}
         />
 
