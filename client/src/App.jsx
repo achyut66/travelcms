@@ -32,6 +32,7 @@ import FlightBookingInfo from "./pages/Classification/FlightBooking";
 
 // reports package
 import BookingReport from "./pages/report/BookingReport";
+import FlightReport from "./pages/report/FlightReport";
 
 export default function App() {
   return (
@@ -83,6 +84,7 @@ export default function App() {
           path="/classification/booking/flight"
           element={<FlightBookingInfo />}
         />
+        <Route path="/report/flight-booking" element={<FlightReport />} />
       </Routes>
     </>
   );

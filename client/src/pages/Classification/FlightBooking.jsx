@@ -5,8 +5,8 @@ import Layout from "../../layouts/Layout.jsx";
 import DynamicModal from "../../components/GridModal.jsx";
 import DynamicEditModal from "../../components/EditGridModal.jsx";
 import ViewModal from "../../components/GridFlightViewModal.jsx";
-import ReceiptViewModal from "../../components/ReceiptModal.jsx";
-import Table from "../../components/Table.jsx";
+import ReceiptViewModal from "../../components/FlightReceipt.jsx";
+import Table from "../../components/FlightTable.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEye,
@@ -34,9 +34,6 @@ export default function FlightBookingInfo() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
-
-  const [isCompleteModalVisible, setIsCompleteModalVisible] = useState(false);
-  const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
 
   const [packageData, setPackageData] = useState([]);
   const [paymentMethodData, setPaymentMethodData] = useState([]);
@@ -316,6 +313,19 @@ export default function FlightBookingInfo() {
           defaultValue: "",
         },
         {
+          name: "pass_type[]",
+          label: "Type",
+          required: true,
+          type: "select2",
+          options: [
+            { value: "Adult", label: "Adult (ADT)" },
+            { value: "Child", label: "Child (CHD)" },
+            { value: "Infant", label: "Infant (INF)" },
+            { value: "Senior", label: "senior (SRC)" },
+          ],
+          defaultValue: "",
+        },
+        {
           name: "passport_no[]",
           label: "Passport Number",
           required: true,
@@ -342,6 +352,12 @@ export default function FlightBookingInfo() {
           name: "email[]",
           label: "Email",
           type: "text",
+          defaultValue: "",
+        },
+        {
+          name: "rate[]",
+          label: "Rate",
+          type: "number",
           defaultValue: "",
         },
         {
@@ -416,41 +432,6 @@ export default function FlightBookingInfo() {
     },
   ];
 
-  // handling is completed
-  const fieldsComplete = [
-    {
-      name: "completion_date",
-      label: "Completion Date",
-      type: "date",
-      required: true,
-      defaultValue: "",
-    },
-    {
-      name: "completion_note",
-      label: "Completion Note",
-      type: "text",
-      required: true,
-      defaultValue: "",
-    },
-    // {
-    //   name: "package_rate",
-    //   label: "Rate Booking",
-    //   type: "number",
-    //   defaultValue: "",
-    // },
-  ];
-
-  // cancel feild
-  const fieldsCancel = [
-    {
-      name: "cancel_reason",
-      label: "Cancel Reason",
-      type: "text",
-      required: true,
-      defaultValue: "",
-    },
-  ];
-
   //  handle submit
   const handleModalSubmit = async (formData) => {
     try {
@@ -477,6 +458,8 @@ export default function FlightBookingInfo() {
           "full_name[]": name,
           "dob[]": dob,
           "gender[]": gender,
+          "pass_type[]": passtype,
+          "rate[]": rate,
           "nationality[]": nationality,
           "passport_no[]": passport,
           "contact_no[]": contact,
@@ -490,6 +473,8 @@ export default function FlightBookingInfo() {
         formPayload.append("full_name[]", name);
         formPayload.append("dob[]", dob || "");
         formPayload.append("gender[]", gender || "");
+        formPayload.append("pass_type[]", passtype || "");
+        formPayload.append("rate[]", rate || "");
         formPayload.append("nationality[]", nationality);
         formPayload.append("passport_no[]", passport);
         formPayload.append("contact_no[]", contact || "");
@@ -621,10 +606,9 @@ export default function FlightBookingInfo() {
   const handleReceiptView = async (id) => {
     setSelectedId(id);
     try {
-      const res = await fetch(`/api/get-booking-with-travellers/${id}`);
+      const res = await fetch(`/api/get-flightbooking-with-travellers/${id}`);
       const data = await res.json();
-
-      // Check if data.data is available before setting state
+      console.log(data);
       if (data.data) {
         setViewReceiptFormData(data.data);
         setReceiptTravellerData(data.data.travellers);
@@ -654,53 +638,49 @@ export default function FlightBookingInfo() {
     }
   };
 
-  const openCompleteModal = (id) => {
-    setSelectedId(id);
-    setIsCompleteModalVisible(true);
-  };
+  const handleComplete = async (id) => {
+    const confirmComplete = window.confirm(
+      "Are you sure you want to complete this booking?"
+    );
 
-  const handleComplete = async (id, formData) => {
-    // console.log(formData);
+    if (!confirmComplete) {
+      return; // Exit if the user cancels the action
+    }
     try {
-      const res = await fetch("/api/booking-complete-register", {
+      const res = await fetch("/api/flight-complete", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          booking_id: id,
-          completion_date: formData.completion_date,
-          completion_note: formData.completion_note,
-          package_rate: formData.package_rate,
-        }),
+        body: JSON.stringify({ booking_id: id }),
       });
+
       const result = await res.json();
       toast.success(result.message);
       setTimeout(() => {
         window.location.reload();
       }, 2000);
     } catch (error) {
-      console.error("Error completing booking:", error);
+      console.error("Error complete booking:", error);
       alert(error.message);
     }
   };
 
-  const openCancelModal = (id) => {
-    setSelectedId(id);
-    setIsCancelModalVisible(true);
-  };
+  const handleCancel = async (id) => {
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this booking?"
+    );
 
-  const handleCancel = async (id, formData) => {
+    if (!confirmCancel) {
+      return; // Exit if the user cancels the action
+    }
     try {
-      const res = await fetch("/api/booking-cancel-register", {
+      const res = await fetch("/api/flight-cancel", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          booking_id: id,
-          cancel_reason: formData.cancel_reason,
-        }),
+        body: JSON.stringify({ booking_id: id }),
       });
 
       const result = await res.json();
@@ -708,7 +688,6 @@ export default function FlightBookingInfo() {
       setTimeout(() => {
         window.location.reload();
       }, 2000);
-      setIsCancelModalVisible(false);
     } catch (error) {
       console.error("Error cancelling booking:", error);
       alert(error.message);
@@ -752,7 +731,7 @@ export default function FlightBookingInfo() {
         <DButton
           className="text-red-500"
           label={<FontAwesomeIcon icon={faTimes} />}
-          onClick={() => openCancelModal(row._id)}
+          onClick={() => handleCancel(row._id)}
           tooltip="Cancel Booking"
           disabled={[2, 3].includes(row.flag)}
         />
@@ -760,7 +739,7 @@ export default function FlightBookingInfo() {
         <SButton
           className="text-green-500"
           label={<FontAwesomeIcon icon={faCheckCircle} />}
-          onClick={() => openCompleteModal(row._id)}
+          onClick={() => handleComplete(row._id)}
           tooltip="Is Booking Completed?"
           disabled={[2, 3].includes(row.flag)}
         />
@@ -871,26 +850,6 @@ export default function FlightBookingInfo() {
           travellers={travellerData}
           id={selectedId}
           displayColumns={displayColumns}
-        />
-
-        <BookingCancelModal
-          visible={isCancelModalVisible}
-          onClose={() => setIsCancelModalVisible(false)}
-          title="Cancel Flight Booking"
-          fields={fieldsCancel} // Assuming this has a "cancel_reason" input
-          onSubmit={(formData) => {
-            handleCancel(selectedId, formData);
-          }}
-        />
-
-        <BookingCompleteModal
-          visible={isCompleteModalVisible}
-          onClose={() => setIsCompleteModalVisible(false)}
-          title="Flight Booking Completed"
-          fields={fieldsComplete}
-          onSubmit={(formData) => {
-            handleComplete(selectedId, formData); // Submit form from modal
-          }}
         />
 
         {viewReceiptFormData ? (

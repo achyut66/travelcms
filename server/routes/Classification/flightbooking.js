@@ -51,7 +51,6 @@ router.post('/flight-register', upload.fields([
   ]), async (req, res) => {
     try {
       const {
-
         company_name,
         dept_airport,
         arrv_airport,
@@ -73,13 +72,16 @@ router.post('/flight-register', upload.fields([
         contact_no = [],
         special_req = [],
         email = [],
+        pass_type = [],
+        rate = [],
         pax_no = 1,
         flag = 0,
         travel_purpose,
       } = req.body;
   
       const invoiceFile = req.files['invoice_receipt']?.[0];
-  
+      const ratesArray = Array.isArray(rate) ? rate.map(Number) : [Number(rate)];
+      const total_rate = ratesArray.reduce((acc, curr) => acc + curr, 0);
       const flightBooking = new FlightBookingInfo({
         company_name,
         dept_airport,
@@ -98,16 +100,19 @@ router.post('/flight-register', upload.fields([
         flag,
         invoice_receipt: invoiceFile ? invoiceFile.filename : '',
         travel_purpose,
+        total_rate
       });
   
       const savedBooking = await flightBooking.save();
-  
+
       const travellerNames = Array.isArray(full_name) ? full_name : [full_name];
       const nationalities = Array.isArray(nationality) ? nationality : [nationality];
       const passportNumbers = Array.isArray(passport_no) ? passport_no : [passport_no];
       const datesOfBirth = Array.isArray(dob) ? dob : [dob];
       const genders = Array.isArray(gender) ? gender : [gender];
       const emails = Array.isArray(email) ? email : [email];
+      const passType = Array.isArray(pass_type) ? pass_type : [pass_type];
+      const Rate = Array.isArray(rate) ? rate : [rate];
       const contactNumbers = Array.isArray(contact_no) ? contact_no : [contact_no];
       const specialRequests = Array.isArray(special_req) ? special_req : [special_req];
   
@@ -121,6 +126,8 @@ router.post('/flight-register', upload.fields([
           gender: genders[i] || '',
           nationality: nationalities[i] || '',
           email:emails[i]||'',
+          pass_type:passType[i]||'',
+          rate:Rate[i]||'',
           passport_no: passportNumbers[i] || '',
           contact_no: contactNumbers[i] || '',
           special_req: specialRequests[i] || '',
@@ -136,7 +143,6 @@ router.post('/flight-register', upload.fields([
     }
   });
   
-
 router.get('/get-flight-booking-details', async (req, res) => {
   try {
     const data = await FlightBookingInfo.find(); // fetches all bookings
@@ -230,15 +236,15 @@ router.get('/get-flightbooking-with-travellers/:id', async (req, res) => {
   }
 });
 // search function
-router.get('/booking-search', async (req, res) => {
+router.get('/flight-search', async (req, res) => {
   const query = req.query.q?.trim();
 
   try {
     let results;
     if (!query) {
-      results = await BookingProfile.find({}).limit(50);
+      results = await FlightBookingInfo.find({}).limit(50);
     } else {
-      results = await BookingProfile.find({
+      results = await FlightBookingInfo.find({
         company_name: { $regex: query, $options: 'i' }
       }).limit(50);
     }
@@ -250,9 +256,9 @@ router.get('/booking-search', async (req, res) => {
 });
 
 // total count
-router.get('/get-booking-count', async (req, res) => {
+router.get('/get-flight-count', async (req, res) => {
   try {
-    const count = await BookingProfile.countDocuments();
+    const count = await FlightBookingInfo.countDocuments();
     res.json({ count });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -260,18 +266,18 @@ router.get('/get-booking-count', async (req, res) => {
 });
 
 // get total number of booking holders with flag 0
-router.get('/get-customer-with-flag', async (req,res) => {
+router.get('/get-flight-with-flag', async (req,res) => {
   try {
-    const result = await BookingProfile.countDocuments({flag:0});
+    const result = await FlightBookingInfo.countDocuments({flag:0});
     res.json({result});
   } catch(error) {
     res.status(500).json({error:error.message});
   }
 });
 
-router.get('/get-booking-by-month', async (req, res) => {
+router.get('/get-flight-by-month', async (req, res) => {
   try {
-    const result = await BookingProfile.aggregate([
+    const result = await FlightBookingInfo.aggregate([
       {
         $group: {
           _id: {
@@ -290,46 +296,37 @@ router.get('/get-booking-by-month', async (req, res) => {
   }
 });
 
-router.get('/get-assigned-bookings', async (req, res) => {
+router.get('/get-canceled-flight', async (req, res) => {
   try {
-    const result = await BookingProfile.countDocuments({ flag: { $in: [1, 4] } });
-    const data = await BookingProfile.find({ flag: { $in: [1, 4] } });
+    const result = await FlightBookingInfo.countDocuments({ flag: 3 });
+    const data = await FlightBookingInfo.find({ flag: 3 });
     res.json({ result, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-router.get('/get-canceled-bookings', async (req, res) => {
+router.get('/get-completed-flight', async (req, res) => {
   try {
-    const result = await BookingProfile.countDocuments({ flag: 3 });
-    const data = await BookingProfile.find({ flag: 3 });
+    const result = await FlightBookingInfo.countDocuments({ flag: 2 });
+    const data = await FlightBookingInfo.find({ flag: 2 });
     res.json({ result, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-router.get('/get-completed-bookings', async (req, res) => {
+router.get('/get-booked-flight', async (req, res) => {
   try {
-    const result = await BookingProfile.countDocuments({ flag: 2 });
-    const data = await BookingProfile.find({ flag: 2 });
-    res.json({ result, data });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-router.get('/get-booked-bookings', async (req, res) => {
-  try {
-    const result = await BookingProfile.countDocuments({ flag: 0 });
-    const data = await BookingProfile.find({ flag: 0 });
+    const result = await FlightBookingInfo.countDocuments({ flag: 0 });
+    const data = await FlightBookingInfo.find({ flag: 0 });
     res.json({ result, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.get('/get-booking-status-summary', async (req, res) => {
+router.get('/get-flight-status-summary', async (req, res) => {
   try {
-    const result = await BookingProfile.aggregate([
+    const result = await FlightBookingInfo.aggregate([
       {
         $group: {
           _id: "$flag", // group by flag
@@ -343,7 +340,7 @@ router.get('/get-booking-status-summary', async (req, res) => {
   }
 });
 
-router.get("/filter-by-date", async (req, res) => {
+router.get("/filter-flight-by-date", async (req, res) => {
   const { from, to, column = "createdAt", status } = req.query;
   let filter = {};
   // console.log(filter);
@@ -356,19 +353,11 @@ router.get("/filter-by-date", async (req, res) => {
       $lte: new Date(`${to}T23:59:59.999Z`)
     };
   }
-  const result = await BookingProfile.find(filter);
+  const result = await FlightBookingInfo.find(filter);
   res.json(result);
   
 });
 
-router.get("/get-isassigned-booking", async (req, res) => {
-  try {
-    const result = await BookingProfile.find({ flag: 1 });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 router.get("/getdata-with-pickupdate", async (req, res) => {
   try {
@@ -403,5 +392,89 @@ router.get("/getdata-with-pickupdate", async (req, res) => {
     res.status(500).json({ message: "Error fetching data" });
   }
 });
+
+// booking cancel
+router.post('/flight-cancel', async (req, res) => {
+    
+    try {
+      const { booking_id } = req.body;
+   
+      if (!booking_id) {
+        return res.status(400).json({ message: "Booking ID is required." });
+      }
+  
+      // Update the flag in FlightBookingInfo
+      const booking = await FlightBookingInfo.findByIdAndUpdate(
+        booking_id,
+        { flag: 3 },
+        { new: true }
+      );
+  
+      if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+  
+      // Delete all traveller profiles associated with this booking
+    //   await flightTravellerProfile.deleteMany({ booking_id });
+  
+      res.json({ message: "Booking cancelled successfully" });
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  });
+// complete booking
+router.post('/flight-complete', async (req, res) => {
+    
+    try {
+      const { booking_id } = req.body;
+   
+      if (!booking_id) {
+        return res.status(400).json({ message: "Booking ID is required." });
+      }
+  
+      // Update the flag in FlightBookingInfo
+      const booking = await FlightBookingInfo.findByIdAndUpdate(
+        booking_id,
+        { flag: 2 },
+        { new: true }
+      );
+  
+      if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+  
+     
+      res.json({ message: "Booking completed successfully" });
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  });  
+
+  router.get('/get-flight-count', async (req, res) => {
+    try {
+      const count = await FlightBookingInfo.countDocuments();
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+    
+  router.get('/get-flight-status-summary', async (req, res) => {
+    try {
+      const result = await FlightBookingInfo.aggregate([
+        {
+          $group: {
+            _id: "$flag", // group by flag
+            count: { $sum: 1 }
+          }
+        }
+      ]);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
 export default router;

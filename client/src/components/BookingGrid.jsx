@@ -11,14 +11,19 @@ import { API_BASE_URL } from "../config";
 
 export default function BookingGrid() {
   const [bookingCount, setBookingCount] = useState(0);
+  const [flightCount, setFlightCount] = useState(0);
   const [newbooking, setNewBooking] = useState(0);
+  const [newflight, setNewFlight] = useState(0);
   const [prevCount, setPrevCount] = useState(0);
   const [shouldBlink, setShouldBlink] = useState(false);
   const [isAssigned, setIsAssigned] = useState([]);
   const [isAssignedData, setIsAssignedData] = useState([]);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isCompletedFlight, setIsCompletedFlight] = useState(false);
   const [isCanceled, setIsCanceled] = useState(false);
+  const [isCanceledFlight, setIsCanceledFlight] = useState(false);
   const [isBooked, setIsBooked] = useState(false);
+  const [isBookedFlight, setIsBookedFlight] = useState(false);
 
   useEffect(() => {
     if (newbooking > prevCount) {
@@ -50,6 +55,7 @@ export default function BookingGrid() {
       console.error("Error fetching data", error.message);
     }
   };
+
   const fetchIsAssigned = async () => {
     try {
       const res = await fetch("/api/get-assigned-bookings");
@@ -92,6 +98,69 @@ export default function BookingGrid() {
     }
   };
 
+  // fetch flight booking details
+
+  useEffect(() => {
+    if (newflight > prevCount) {
+      setShouldBlink(true);
+    }
+    setPrevCount(newflight);
+  }, [newflight]);
+
+  const handleViewFlight = () => {
+    setShouldBlink(false);
+  };
+
+  const fetchFlightCount = async () => {
+    try {
+      const res = await fetch("/api/get-flight-count");
+      const data = await res.json();
+      setFlightCount(data.count);
+    } catch (error) {
+      console.error("Error fetching booking count:", error.message);
+    }
+  };
+
+  const fetchNewFlight = async () => {
+    try {
+      const res = await fetch("/api/get-flight-with-flag");
+      const data = await res.json();
+      setNewFlight(data.result);
+    } catch (error) {
+      console.error("Error fetching data", error.message);
+    }
+  };
+
+  const fetchIsCompletedFlight = async () => {
+    try {
+      const res = await fetch("/api/get-completed-flight");
+      const data = await res.json();
+      setIsCompletedFlight(data.result);
+    } catch (error) {
+      console.error("Error fetching completed booking count:", error.message);
+    }
+  };
+
+  const fetchIsBookedFlight = async () => {
+    try {
+      const res = await fetch("/api/get-booked-flight");
+      const data = await res.json();
+      setIsBookedFlight(data.result);
+    } catch (error) {
+      console.error("Error fetching canceled booking count:", error.message);
+    }
+  };
+
+  const fetchIsCanceledFlight = async () => {
+    try {
+      const res = await fetch("/api/get-canceled-flight");
+      const data = await res.json();
+      setIsCanceledFlight(data.result);
+    } catch (error) {
+      console.error("Error fetching canceled booking count:", error.message);
+    }
+  };
+
   useEffect(() => {
     fetchBookingCount();
     fetchIsAssigned();
@@ -99,6 +168,11 @@ export default function BookingGrid() {
     fetchIsCanceled();
     fetchIsBooked();
     fetchNewBooking();
+    fetchFlightCount();
+    fetchNewFlight();
+    fetchIsCompletedFlight();
+    fetchIsBookedFlight();
+    fetchIsCanceledFlight();
 
     // Optional: auto-refresh every 30 seconds
     const interval = setInterval(() => {
@@ -108,6 +182,11 @@ export default function BookingGrid() {
       fetchIsCanceled();
       fetchIsBooked();
       fetchNewBooking();
+      fetchFlightCount();
+      fetchNewFlight();
+      fetchIsCompletedFlight();
+      fetchIsBookedFlight();
+      fetchIsCanceledFlight();
     }, 300);
 
     return () => clearInterval(interval);
@@ -222,26 +301,89 @@ export default function BookingGrid() {
           </div>
         </div>
 
-        {/* Enquiries Card */}
-        {/* <div className="relative bg-gray-500 shadow-md p-6 transition-transform hover:scale-102">
-          <div className="absolute top-4 right-4">
-            <NotificationBadge count={3} />
+        <div className="relative bg-yellow-300 shadow-md  p-6 transition-transform hover:scale-102">
+          <div
+            className={`absolute top-4 right-4 ${
+              shouldBlink ? "animate-blink-shrink" : ""
+            }`}
+            onClick={handleViewFlight}
+          >
+            <Link to={"/classification/booking/flight"}>
+              <NotificationBadge count={newflight} />
+            </Link>
           </div>
-          <div className="text-center mb-2">
-            <FontAwesomeIcon icon={faInfoCircle} size="2x" />
-          </div>
-          <h3 className="text-xl text-center font-semibold mb-2">Enquiries</h3>
-        </div> */}
 
-        {/* Flights Card */}
-        <div className="relative bg-yellow-300 shadow-md p-6 transition-transform hover:scale-102">
-          <div className="absolute top-4 right-4">
-            <NotificationBadge count={3} />
-          </div>
           <div className="text-center mb-2">
             <FontAwesomeIcon icon={faPlane} size="2x" />
           </div>
-          <h3 className="text-xl text-center font-semibold mb-2">Flights</h3>
+
+          <h3 className="text-xl text-center font-semibold mb-2">
+            Total Flights
+          </h3>
+
+          <div className="text-center text-black font-bold text-2xl">
+            <Link to={"/classification/booking/flight"}>{flightCount}</Link>
+          </div>
+
+          <div className="mt-4 grid grid-cols-5 gap-2 text-sm text-center ml-[160px]">
+            <div className="relative group">
+              <div
+                className="bg-blue-400 text-black h-12 w-20 flex flex-col items-center justify-center cursor-pointer"
+                style={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.7)" }}
+              >
+                <div className="font-semibold text-white">Booked</div>
+                <div className="text-white text-sm">{isBookedFlight}</div>
+              </div>
+
+              {/* Hover modal */}
+              <div className="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded-md bg-white shadow-lg border p-3 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 z-50">
+                <div className="font-bold mb-1 text-black">Booking Details</div>
+                <p className="text-sm text-gray-600">
+                  "Only Booked – Not Yet Finished"
+                </p>
+              </div>
+            </div>
+
+            <div className="relative group ml-[20px]">
+              <div
+                className="bg-green-400 text-black h-12 w-20 flex flex-col items-center justify-center"
+                style={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.7)" }}
+              >
+                <div className="font-semibold text-white">Completed</div>
+                <div className="text-white text-sm">{isCompletedFlight}</div>
+              </div>
+              {/* Hover modal */}
+              <div className="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded-md bg-white shadow-lg border p-3 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 z-50">
+                <div className="font-bold mb-1 text-black">
+                  Completed Details
+                </div>
+                <p className="text-sm text-gray-600">
+                  "Completed bookings that have successfully finished all
+                  assigned flights."
+                </p>
+              </div>
+            </div>
+
+            <div className="relative group ml-[40px]">
+              <div
+                className="bg-red-500 text-black h-12 w-20 flex flex-col items-center justify-center"
+                style={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.7)" }}
+              >
+                <div className="font-semibold text-white">Canceled</div>
+                <div className="text-white text-sm">{isCanceledFlight}</div>
+              </div>
+              {/* Hover modal */}
+              <div className="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded-md bg-white shadow-lg border p-3 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 z-50">
+                <div className="font-bold mb-1 text-black">
+                  Cancelled Details
+                </div>
+                <p className="text-sm text-gray-600">
+                  "Canceled bookings that were officially withdrawn before task
+                  execution."
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

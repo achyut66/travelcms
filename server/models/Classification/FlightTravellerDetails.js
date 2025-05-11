@@ -8,6 +8,8 @@ const flightTravellerSchema = new mongoose.Schema({
     nationality: { type: String},
     passport_no: { type: String, required: true },
     contact_no: { type: String},
+    pass_type: {type:String},
+    rate: {type:String},
     email: { type: String},
     special_req: { type: String }
   });

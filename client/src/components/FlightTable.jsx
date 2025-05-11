@@ -20,7 +20,7 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/booking-search?q=${encodeURIComponent(
+        `${API_BASE_URL}/api/flight-search?q=${encodeURIComponent(
           trimmedQuery
         )}`
       );

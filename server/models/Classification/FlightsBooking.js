@@ -20,6 +20,7 @@ const flightBookingSchema = new mongoose.Schema({
   insurance: { type: String },
   special_assist: { type: String },
   pax_no: { type: Number, required: true },
+  total_rate : {type: Number},
   flag: {type: Number}
 }, { timestamps: true });
 

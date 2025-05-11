@@ -140,45 +140,54 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                 onClick={() => setIsBookingDropdownOpen(!isBookingDropdownOpen)}
                 className="hover:text-blue-600 cursor-pointer flex justify-between items-center"
               >
-                <div className="flex items-center gap-2">
+                <div className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mb-[-7px]">
                   <FontAwesomeIcon icon={faClipboardList} />
+                  &nbsp;&nbsp;
                   <span>Booking Details</span>
+                  &nbsp;
+                  <span>{isBookingDropdownOpen ? "▲" : "▼"}</span>
                 </div>
-                <span>{isBookingDropdownOpen ? "▲" : "▼"}</span>
               </li>
 
               {isBookingDropdownOpen && (
-                <ul className="ml-3 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
+                <ul className="ml-5 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
                   <Link to={"/classification/booking"}>
-                    <li className="hover:text-blue-600 cursor-pointer mb-[7px]">
-                      <FontAwesomeIcon icon={faCubes} /> &nbsp;&nbsp;Package
+                    <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200">
+                      <FontAwesomeIcon icon={faCubes} />
+                      &nbsp;&nbsp;Package
                     </li>
                   </Link>
-                  <hr className="border-sm text-gray-400" />
                   <Link to={"/classification/booking/flight"}>
-                    <li className="hover:text-blue-600 cursor-pointer mb-[7px]">
-                      <FontAwesomeIcon icon={faPlane} /> &nbsp;&nbsp;Flight
+                    <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200">
+                      <FontAwesomeIcon icon={faPlane} />
+                      &nbsp; Flight
                     </li>
                   </Link>
-                  <hr className="border-sm text-gray-400" />
-                  <Link to={"/classification/booking"}>
+                  {/* <Link to={"/classification/booking"}>
                     <li className="hover:text-blue-600 cursor-pointer">
                       <FontAwesomeIcon icon={faBus} />{" "}
                       &nbsp;&nbsp;Transportation
                     </li>
-                  </Link>
-                  <hr className="border-sm text-gray-400 mt-2" />
+                  </Link> */}
                 </ul>
               )}
 
-              <li className="hover:text-blue-600 cursor-pointer">
-                <Link to={"/classification/extras"}>
+              {/* <li className="hover:text-blue-600 cursor-pointer"> */}
+              <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-2px]">
+                <Link
+                  to={"/classification/extras"}
+                  className="flex items-center space-x-2"
+                >
                   <FontAwesomeIcon icon={faDollarSign} /> &nbsp;&nbsp;Extras
                 </Link>
               </li>
 
-              <li className="hover:text-blue-600 cursor-pointer">
-                <Link to={"/classification/itinery"}>
+              {/* <li className="hover:text-blue-600 cursor-pointer"> */}
+              <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-9px]">
+                <Link
+                  to={"/classification/itinery"}
+                  className="flex items-center space-x-2"
+                >
                   <FontAwesomeIcon icon={faRoute} /> &nbsp;&nbsp;Itinerary
                 </Link>
               </li>
@@ -202,10 +211,22 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
           {isReportOpen && isSidebarOpen && (
             <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
-              <li className="hover:text-blue-600 cursor-pointer">
-                <Link to={"/report/booking"}>
-                  <FontAwesomeIcon icon={faClipboardList} /> &nbsp;&nbsp;
-                  Booking Report's
+              <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mb-[-3px]">
+                <Link
+                  to={"/report/booking"}
+                  className="flex items-center space-x-2"
+                >
+                  <FontAwesomeIcon icon={faClipboardList} />
+                  <span>Booking Report's</span>
+                </Link>
+              </li>
+              <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200">
+                <Link
+                  to="/report/flight-booking"
+                  className="flex items-center space-x-2"
+                >
+                  <FontAwesomeIcon icon={faClipboardList} />
+                  <span>Flight Report's</span>
                 </Link>
               </li>
             </ul>
@@ -235,62 +256,62 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             </li>
             {isProfileOpen && isSidebarOpen && (
               <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200">
                   <Link to="/settings/company-profile">
                     <FontAwesomeIcon icon={faBuilding} />
                     &nbsp;&nbsp;Company Profile
                   </Link>
                 </li>
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/package">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Package
                   </Link>
                 </li>
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/paymentstatus">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Payment Status
                   </Link>
                 </li>
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/paymentmethod">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Payment Method
                   </Link>
                 </li>
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/visitpurpose">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Visit Purpose
                   </Link>
                 </li>
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/nationality">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Nationality
                   </Link>
                 </li>
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/language">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Language
                   </Link>
                 </li>
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/transportation">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Vehicle
                   </Link>
                 </li>
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/flight">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Flight
                   </Link>
                 </li>
 
-                <li className="hover:text-blue-600 cursor-pointer">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/guide_potter">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Guide/Potter

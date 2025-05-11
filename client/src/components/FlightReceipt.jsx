@@ -4,6 +4,7 @@ import logo from "../../public/images/logo.png";
 import "../index.css";
 
 const ReceiptViewModal = ({ visible, onClose, row = {}, receiptData }) => {
+  //   console.log(receiptData.travellers);
   const [packageRate, setPackageRate] = useState("");
   const [extraData, setExtraData] = useState([]);
   const [userData, setUserData] = useState([]);
@@ -78,53 +79,16 @@ const ReceiptViewModal = ({ visible, onClose, row = {}, receiptData }) => {
       });
   };
 
-  useEffect(() => {
-    if (!receiptData.package_name) return;
-    const fetchRate = async () => {
-      try {
-        const response = await fetch(
-          `/api/get-rate-by-package/${encodeURIComponent(
-            receiptData.package_name
-          )}`
-        );
-        const result = await response.json();
-        setPackageRate(result.rate);
-      } catch (error) {
-        console.log("Can't fetch rate", error);
-      }
-    };
-    fetchRate();
-  }, [receiptData.package_name]);
-
-  useEffect(() => {
-    if (!receiptData._id) return;
-    const fetchExtras = async () => {
-      try {
-        const response = await fetch(
-          `/api/get-by-bookingid/${encodeURIComponent(receiptData._id)}`
-        );
-        const result = await response.json();
-        setExtraData(result.length > 0 ? result : null);
-      } catch (error) {
-        console.log("Can't fetch extras", error);
-      }
-    };
-    fetchExtras();
-  }, [receiptData._id]);
-
   const receiptInfo = {
     receiptNo: receiptNo,
     date: row.date || new Date().toISOString().split("T")[0],
     note: "Please retain this receipt for future reference.",
   };
 
-  const extrasTotal = (extraData || []).reduce(
-    (sum, item) =>
-      sum + (item.extra_item_price || 0) * (item.extra_item_quantity || 1),
-    0
-  );
+  const subtotal = receiptData.travellers.reduce((sum, data) => {
+    return sum + parseFloat(data.rate || 0);
+  }, 0);
 
-  const subtotal = (parseFloat(packageRate) || 0) + extrasTotal;
   const vatAmount = subtotal * 0.13;
   const total = subtotal + vatAmount;
 
@@ -171,7 +135,7 @@ const ReceiptViewModal = ({ visible, onClose, row = {}, receiptData }) => {
         receipt_no: receiptNo,
         print_date: printDate,
         booking_id: receiptData._id,
-        receipt_type: "Package",
+        receipt_type: "Flight",
       };
 
       const response = await fetch("/api/receipt-print-register", {
@@ -189,12 +153,13 @@ const ReceiptViewModal = ({ visible, onClose, row = {}, receiptData }) => {
   };
 
   // print count
+
   useEffect(() => {
     const fetchReceiptNo = async () => {
       try {
         const { _id: bookingId } = receiptData;
         const response = await fetch(
-          `/api/get-latest-receipt?booking_id=${bookingId}&receipt_type=Package`
+          `/api/get-latest-receipt?booking_id=${bookingId}&receipt_type=Flight`
         );
         const result = await response.json();
 
@@ -280,10 +245,10 @@ const ReceiptViewModal = ({ visible, onClose, row = {}, receiptData }) => {
                       <strong>Name:</strong> {receiptData.company_name}
                     </div>
                     <div>
-                      <strong>Address:</strong> {receiptData.company_address}
+                      <strong>From:</strong> {receiptData.dept_airport}
                     </div>
                     <div>
-                      <strong>Contact:</strong> {receiptData.contact_number}
+                      <strong>To:</strong> {receiptData.arrv_airport}
                     </div>
                   </div>
                   <table className="w-full">
@@ -297,33 +262,47 @@ const ReceiptViewModal = ({ visible, onClose, row = {}, receiptData }) => {
                     </thead>
                     <tbody>
                       <tr>
-                        <td>{receiptData.package_name}</td>
-                        <td>1</td>
-                        <td>{packageRate}</td>
-                        <td>{packageRate}</td>
+                        <td>
+                          Flight Booking{" "}
+                          {" (" +
+                            receiptData.dept_airport +
+                            "-" +
+                            receiptData.arrv_airport +
+                            " )"}
+                        </td>
+                        <td>{receiptData.pax_no}</td>
+                        {/* <td>{receiptData.travellers && receiptData.travellers.length > 0 && (
+                            receiptData.travellers.map(data ,idx) {
+                                data.rate
+                            }
+                        )}</td> */}
+                        {/* <td>5000</td> */}
                       </tr>
 
                       {/* Extras Section */}
-                      {extraData.length > 0 && (
+                      {/* Travellers Section */}
+                      {receiptData.travellers.length > 0 && (
                         <tr>
                           <td colSpan="4" className="font-semibold bg-gray-50">
-                            Extras
+                            Travellers
                           </td>
                         </tr>
                       )}
 
-                      {extraData.map((item, idx) => (
+                      {receiptData.travellers.map((item, idx) => (
                         <tr key={idx}>
-                          <td>{item.extra_item}</td>
-                          <td>{item.extra_item_quantity}</td>
-                          <td>{item.extra_item_price}</td>
                           <td>
-                            {(
-                              item.extra_item_quantity * item.extra_item_price
-                            ).toFixed(2)}
+                            {item.full_name}
+                            <span className="text-xs text-gray-500">
+                              {" (" + item.pass_type + " )"}
+                            </span>
                           </td>
+                          <td>&nbsp;</td>
+                          <td>{item.rate}</td>
+                          <td>{(item.rate * 1).toFixed(2)}</td>
                         </tr>
                       ))}
+
                       <tr>
                         <td colSpan={4}>&nbsp;</td>
                       </tr>
