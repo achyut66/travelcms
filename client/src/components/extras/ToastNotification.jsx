@@ -15,7 +15,6 @@ const DashboardNotification = () => {
       try {
         const bookingDetails = await fetch("/api/getdata-with-pickupdate");
         const result = await bookingDetails.json();
-        // console.log(result);
         setHasNotification(result.count);
         setNotifications(result.data); // Optional: store actual data
       } catch (error) {
