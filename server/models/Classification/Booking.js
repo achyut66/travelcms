@@ -12,7 +12,7 @@ const bookingSchema = new mongoose.Schema({
   departure_date: { type: Date, required: true },
   return_date: { type: Date, required: true },
   pickup_location: { type: String, required: true },
-  pickup_date: { type: String },
+  pickup_date: { type: Date, required:true },
   drop_location: { type: String, required: true },
 
   method: { type: String},

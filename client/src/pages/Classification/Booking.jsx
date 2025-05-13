@@ -251,6 +251,7 @@ export default function CompanyProfile() {
     {
       name: "pickup_date",
       label: "Pick-Up Date",
+      required: true,
       type: "date",
       defaultValue: "",
     },
@@ -323,7 +324,7 @@ export default function CompanyProfile() {
     {
       name: "flight_time",
       label: "Flight Time",
-      type: "text",
+      type: "time",
       defaultValue: "",
     },
     // option fields

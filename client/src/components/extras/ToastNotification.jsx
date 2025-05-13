@@ -3,15 +3,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
+import Sound from "../../assets/media/noti.mp3";
+
+// console.log(Sound);
 const DashboardNotification = () => {
   const [hasNotification, setHasNotification] = useState(0);
   const [notifications, setNotifications] = useState([]);
-
+  // console.log(hasNotification);
   useEffect(() => {
     const fetchNotification = async () => {
       try {
         const bookingDetails = await fetch("/api/getdata-with-pickupdate");
         const result = await bookingDetails.json();
+        // console.log(result);
         setHasNotification(result.count);
         setNotifications(result.data); // Optional: store actual data
       } catch (error) {

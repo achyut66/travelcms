@@ -79,7 +79,6 @@ router.post('/booking-register', upload.fields([
       special_instruction, preferred_language, purpose,pax_no,flag,pickup_date,airlines_name, flight_taken_date, flight_number, flight_time,
       extra_total,package_total,
     });
-
     const savedBooking = await booking.save();
     const paxCount = parseInt(pax_no) || 1;
 
@@ -400,7 +399,6 @@ router.get("/getdata-with-pickupdate", async (req, res) => {
     const twoDaysLater = new Date(startOfDay.getTime() + 2 * 24 * 60 * 60 * 1000); 
     twoDaysLater.setHours(0, 0, 0, 0); 
     const formattedTwoDaysLater = twoDaysLater.toISOString().slice(0, 10); 
-
     const response = await BookingProfile.find({
       pickup_date: {
         $gte: formattedDate,       

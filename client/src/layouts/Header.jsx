@@ -8,12 +8,13 @@ import DButton from "../components/PowerBtn.jsx";
 import DashboardNotification from "../components/extras/ToastNotification";
 import { isSessionValid, clearSession } from "../utils/session";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config.js";
 
 // import Clock from "../components/Clock.jsx";
 
 const Header = () => {
   const handleLogout = async () => {
-    const res = await fetch("http://localhost:5000/api/logout", {
+    const res = await fetch(`${API_BASE_URL}/api/logout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -25,16 +26,11 @@ const Header = () => {
   };
   const navigate = useNavigate();
   useEffect(() => {
-    if (!isSessionValid()) {
-      clearSession();
-      alert("Session expired!");
-      navigate("/");
-    }
     const timer = setTimeout(() => {
       clearSession();
       alert("Session expired!");
       navigate("/");
-    }, 60 * 60 * 1000); // 1 minute timeout
+    }, 60 * 60 * 60 * 1000); // 1 hour timeout
 
     return () => clearTimeout(timer); // Clean on unmount
   }, [navigate]);

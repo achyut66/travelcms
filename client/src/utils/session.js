@@ -1,8 +1,9 @@
 // utils/session.jsconst 
 
 const setSession = () => {
-  const expiryTime = new Date().getTime() + 60 * 60 * 1000; // 1 hour
+  const expiryTime = new Date().getTime() + 60 * 60 * 60 * 1000; // 1 hour
   localStorage.setItem("session_expiry", expiryTime);
+  console.log(expiryTime);
 };
   
   export const isSessionValid = () => {
