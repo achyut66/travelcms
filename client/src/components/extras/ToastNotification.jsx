@@ -5,11 +5,9 @@ import { Link } from "react-router-dom";
 
 import Sound from "../../assets/media/noti.mp3";
 
-// console.log(Sound);
 const DashboardNotification = () => {
   const [hasNotification, setHasNotification] = useState(0);
   const [notifications, setNotifications] = useState([]);
-  // console.log(hasNotification);
   useEffect(() => {
     const fetchNotification = async () => {
       try {
@@ -17,12 +15,27 @@ const DashboardNotification = () => {
         const result = await bookingDetails.json();
         setHasNotification(result.count);
         setNotifications(result.data); // Optional: store actual data
+        if (result.count > 0) {
+          const audio = new Audio(Sound);
+          audio.play().catch((err) => {
+            console.error("Error playing notification sound:", err);
+          });
+        }
       } catch (error) {
         console.log("error fetching data", error);
       }
     };
     fetchNotification();
   }, []);
+
+  useEffect(() => {
+    if (hasNotification > 0) {
+      const audio = new Audio(Sound);
+      audio.play().catch((err) => {
+        console.error("Error playing notification sound:", err);
+      });
+    }
+  }, [hasNotification]);
 
   return (
     <div className="relative group inline-block">
