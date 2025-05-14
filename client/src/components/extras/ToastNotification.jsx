@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
@@ -8,34 +8,53 @@ import Sound from "../../assets/media/noti.mp3";
 const DashboardNotification = () => {
   const [hasNotification, setHasNotification] = useState(0);
   const [notifications, setNotifications] = useState([]);
+  const prevNotificationCount = useRef(0);
+  const isTabActive = useRef(true);
+
+  // Track tab visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isTabActive.current = !document.hidden;
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
   useEffect(() => {
     const fetchNotification = async () => {
       try {
-        const bookingDetails = await fetch("/api/getdata-with-pickupdate");
-        const result = await bookingDetails.json();
-        setHasNotification(result.count);
-        setNotifications(result.data); // Optional: store actual data
-        if (result.count > 0) {
+        const response = await fetch("/api/getdata-with-pickupdate");
+        const result = await response.json();
+
+        // Play sound only if new notifications arrive AND the tab is active
+        if (
+          isTabActive.current &&
+          result.count > prevNotificationCount.current
+        ) {
           const audio = new Audio(Sound);
           audio.play().catch((err) => {
             console.error("Error playing notification sound:", err);
           });
         }
+
+        // Update state and ref
+        setHasNotification(result.count);
+        setNotifications(result.data);
+        prevNotificationCount.current = result.count;
       } catch (error) {
-        console.log("error fetching data", error);
+        console.log("Error fetching data:", error);
       }
     };
-    fetchNotification();
-  }, []);
 
-  useEffect(() => {
-    if (hasNotification > 0) {
-      const audio = new Audio(Sound);
-      audio.play().catch((err) => {
-        console.error("Error playing notification sound:", err);
-      });
-    }
-  }, [hasNotification]);
+    fetchNotification();
+
+    // Optional polling interval
+    const interval = setInterval(fetchNotification, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="relative group inline-block">
@@ -63,9 +82,8 @@ const DashboardNotification = () => {
           ) : (
             notifications.map((item, index) => (
               <Link
-                to={"/classification/booking"}
+                to="/classification/booking"
                 key={index}
-                // href={`/bookings/${item._id}`}
                 className="block mb-2 p-2 rounded-md bg-gray-50 hover:bg-gray-300 transition-colors"
               >
                 <div className="text-sm font-medium text-gray-800">
