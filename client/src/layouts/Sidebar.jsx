@@ -163,12 +163,12 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                       &nbsp; Flight
                     </li>
                   </Link>
-                  {/* <Link to={"/classification/booking"}>
-                    <li className="hover:text-blue-600 cursor-pointer">
-                      <FontAwesomeIcon icon={faBus} />{" "}
-                      &nbsp;&nbsp;Transportation
+                  <Link to={"/classification/vehicle"}>
+                    <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200">
+                      <FontAwesomeIcon icon={faBus} />
+                      &nbsp;&nbsp;Vehicle
                     </li>
-                  </Link> */}
+                  </Link>
                 </ul>
               )}
 
