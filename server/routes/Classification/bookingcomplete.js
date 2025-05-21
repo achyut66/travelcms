@@ -11,7 +11,7 @@ import  packageSettings  from '../../models/Settings/Package.js';
 // Define the route to handle the POST request
 router.post("/booking-complete-register", async (req, res) => {
   try {
-    const { booking_id, completion_date, completion_note,package_rate } = req.body;
+    const { booking_id, completion_date, completion_note, package_rate, receive_amount } = req.body;
 
     const booking = await BookingProfile.findById(booking_id);
     if (!booking) {
@@ -20,7 +20,7 @@ router.post("/booking-complete-register", async (req, res) => {
 
     // Get package rate
     const packageData = await packageSettings.findOne({ package: booking.package_name });
-    const packagevalue = packageData ? packageData.rate : 0;
+    const packagevalue = packageData ? Number(packageData.rate || 0) : 0;
 
     // Calculate total of extras
     const extraData = await extrasSettings.find({ booking_id });
@@ -59,8 +59,15 @@ router.post("/booking-complete-register", async (req, res) => {
     await bookingComplete.save();
 
     // Update original booking
+
+    const total_income = extraTotal + packagevalue;
+    // console.log(total_income);
+    const receive = Number(receive_amount ||0);
+    const due_amountt = total_income - receive;
     booking.extra_total = extraTotal;
     booking.package_total = packagevalue;
+    booking.receive_amount = receive_amount;
+    booking.due_amount = due_amountt;
     booking.flag = 2;
     await booking.save();
 

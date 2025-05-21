@@ -14,6 +14,8 @@ import mongoose from 'mongoose';
 import { count } from 'console';
 import nodemailer from 'nodemailer';
 
+// import accountProfile from '../../models/Account/AccountEntry.js';
+
 // Email transporter setup
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -423,6 +425,121 @@ router.get("/getdata-with-pickupdate", async (req, res) => {
   }
 });
 
+router.get("/month-wise-account-report", async (req, res) => {
+  try {
+    // Step 1: Run aggregation grouped by year & month
+    const aggregationResult = await BookingProfile.aggregate([
+      {
+        $match: { flag: 2 }  // If you want to filter by flag=2, else remove this
+      },
+      {
+        $addFields: {
+          monthNum: { $month: "$createdAt" },
+          year: { $year: "$createdAt" },
+        },
+      },
+      {
+        $group: {
+          _id: { year: "$year", monthNum: "$monthNum" },
+          count: { $sum: 1 },
+          package_total: { $sum: "$package_total" },
+          extra_total: { $sum: "$extra_total" },
+          receive_amount: { $sum: "$receive_amount" },
+          due_amount: { $sum: "$due_amount" },
+          ids: { $push: "$_id" },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.monthNum": 1,
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id.year",
+          monthNum: "$_id.monthNum",
+          count: 1,
+          package_total: 1,
+          extra_total: 1,
+          receive_amount: 1,
+          due_amount: 1,
+          ids: 1,
+        },
+      },
+    ]);
+
+    const years = [...new Set(aggregationResult.map(item => item.year))];
+    if (years.length === 0) years.push(new Date().getFullYear());
+
+    const allMonths = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    const fullData = [];
+
+years.forEach(year => {
+  const monthsForYear = allMonths.map((monthName, idx) => ({
+    month: monthName, 
+    count: 0,
+    package_total: 0,
+    extra_total: 0,
+    receive_amount: 0,
+    due_amount: 0,
+  }));
+
+  aggregationResult
+    .filter(item => item.year === year)
+    .forEach(item => {
+      monthsForYear[item.monthNum - 1] = {
+        month: allMonths[item.monthNum - 1],  // only month name here too
+        count: item.count,
+        package_total: item.package_total,
+        extra_total: item.extra_total,
+        receive_amount: item.receive_amount,
+        due_amount: item.due_amount,
+        ids: item.ids,
+
+      };
+    });
+  fullData.push(...monthsForYear);
+});
+
+    res.status(200).json({
+      message: "Fetched successfully",
+      data: fullData,
+      year:years,
+    });
+  } catch (error) {
+    console.error("Aggregation error:", error);
+    res.status(500).json({
+      message: "Error fetching data",
+      error: error.message,
+    });
+  }
+});
+
+router.post("/account-report/details", async (req, res) => {
+  const { ids } = req.body;
+  try {
+    const result = await BookingProfile.find({ _id: { $in: ids } });
+    res.json({ data: result });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching details", error });
+  }
+});
+
+router.post("/get-account-data-byid",async (req,res) => {
+  const {id} = req.body;
+  try {
+    const result = await BookingProfile.findById(id);
+    res.json({data:result});
+  } catch(error) {
+    res.status(500).json({message:"error fetching data"});
+  }
+});
 
 
 export default router;

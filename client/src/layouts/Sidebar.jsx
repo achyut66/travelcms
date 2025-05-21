@@ -16,6 +16,10 @@ import {
   faCubes,
   faRocket,
   faFile,
+  faBox,
+  faTools,
+  faFileAlt,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import Clock from "../components/Clock.jsx";
 import { API_BASE_URL } from "../config.js";
@@ -25,6 +29,8 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isBookingDropdownOpen, setIsBookingDropdownOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isInventoryOpen, setIsInventoryOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [profileData, setProfileData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -234,6 +240,82 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
           <div>
             <li
+              onClick={() => setIsInventoryOpen(!isInventoryOpen)}
+              className="hover:text-gray-400 cursor-pointer flex justify-between items-center"
+            >
+              <div className="flex items-center gap-2">
+                <div
+                  className={`flex items-center transition-all duration-300 ${
+                    isSidebarOpen ? "justify-start" : "justify-center pr-5"
+                  }`}
+                >
+                  <FontAwesomeIcon
+                    icon={faBox}
+                    className={`transition-all duration-300 ${
+                      isSidebarOpen ? "text-xl" : "text-[30px]"
+                    }`}
+                  />
+                </div>
+                {isSidebarOpen && <span>Inventory</span>}
+              </div>
+              {isSidebarOpen && <span>{isInventoryOpen ? "▲" : "▼"}</span>}
+            </li>
+            {isInventoryOpen && isSidebarOpen && (
+              <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200">
+                  <Link to="/inventory/transportation">
+                    <FontAwesomeIcon icon={faCog} />
+                    &nbsp;&nbsp;Vehicle
+                  </Link>
+                </li>
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
+                  <Link to="/inventory/equipment">
+                    <FontAwesomeIcon icon={faTools} />
+                    &nbsp;&nbsp;Equipments
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </div>
+
+          {/* account report section */}
+          <div>
+            <li
+              onClick={() => setIsAccountOpen(!isAccountOpen)}
+              className="hover:text-gray-400 cursor-pointer flex justify-between items-center"
+            >
+              <div className="flex items-center gap-2">
+                <div
+                  className={`flex items-center transition-all duration-300 ${
+                    isSidebarOpen ? "justify-start" : "justify-center pr-5"
+                  }`}
+                >
+                  <FontAwesomeIcon
+                    icon={faChartLine}
+                    className={`transition-all duration-300 ${
+                      isSidebarOpen ? "text-xl" : "text-[30px]"
+                    }`}
+                  />
+                </div>
+                {isSidebarOpen && <span>Account</span>}
+              </div>
+              {isSidebarOpen && <span>{isAccountOpen ? "▲" : "▼"}</span>}
+            </li>
+            {isAccountOpen && isSidebarOpen && (
+              <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200">
+                  <Link to="/account/annual-account-report">
+                    <FontAwesomeIcon icon={faFileAlt} />
+                    &nbsp;Annual Accounting
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </div>
+          {/* end of account */}
+
+          <div>
+            <li
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="hover:text-gray-400 cursor-pointer flex justify-between items-center"
             >
@@ -258,7 +340,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
               <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300 bg-gray-800 rounded-md p-2">
                 <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200">
                   <Link to="/settings/company-profile">
-                    <FontAwesomeIcon icon={faBuilding} />
+                    <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Company Profile
                   </Link>
                 </li>
@@ -298,12 +380,12 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                     &nbsp;&nbsp;Language
                   </Link>
                 </li>
-                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
+                {/* <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/transportation">
                     <FontAwesomeIcon icon={faCog} />
                     &nbsp;&nbsp;Vehicle
                   </Link>
-                </li>
+                </li> */}
                 <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/flight">
                     <FontAwesomeIcon icon={faCog} />

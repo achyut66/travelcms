@@ -22,7 +22,7 @@ import PaymentStatusSetting from "./pages/Settings/PaymentStatus";
 import VisitPurposeSetting from "./pages/Settings/VisitPurpose";
 import LanguageSetting from "./pages/Settings/Language";
 import GuideSetting from "./pages/Settings/Guide";
-import TransportationSetting from "./pages/Settings/Transportation";
+import TransportationSetting from "./pages/Inventory/Transportation";
 import FlightSetting from "./pages/Settings/Flight";
 import Itenerary from "./pages/Classification/Itenerary/Itinery";
 import ExtraDetails from "./pages/Classification/Extras/ExtraDetails";
@@ -30,6 +30,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FlightBookingInfo from "./pages/Classification/FlightBooking";
 import VehicleBooking from "./pages/Classification/BusBooking";
+import EquipmentSetting from "./pages/Inventory/EquipmentInventory";
+import AccountReport from "./pages/Account/AnnualAccountReport";
 
 // reports package
 import BookingReport from "./pages/report/BookingReport";
@@ -65,7 +67,7 @@ export default function App() {
         <Route path="/settings/language" element={<LanguageSetting />} />
         <Route path="/settings/guide_potter" element={<GuideSetting />} />
         <Route
-          path="/settings/transportation"
+          path="/inventory/transportation"
           element={<TransportationSetting />}
         />
         <Route path="/settings/flight" element={<FlightSetting />} />
@@ -89,6 +91,11 @@ export default function App() {
         <Route
           path="/classification/booking/vehicle"
           element={<VehicleBooking />}
+        />
+        <Route path="/inventory/equipment" element={<EquipmentSetting />} />
+        <Route
+          path="/account/annual-account-report"
+          element={<AccountReport />}
         />
       </Routes>
     </>

@@ -153,7 +153,7 @@ export default function CompanyProfile() {
   // console.log(isVehicleUsed);
   const getVehicleUsed = async () => {
     try {
-      const response = await fetch("/api/vehicle-data");
+      const response = await fetch("/api/vehicle-data-1");
       const data = await response.json();
       setIsVehicleUsed(data);
     } catch (error) {
@@ -494,12 +494,12 @@ export default function CompanyProfile() {
       required: true,
       defaultValue: "",
     },
-    // {
-    //   name: "package_rate",
-    //   label: "Rate Booking",
-    //   type: "number",
-    //   defaultValue: "",
-    // },
+    {
+      name: "receive_amount",
+      label: "Amount Received",
+      type: "number",
+      defaultValue: "",
+    },
   ];
   // pickup field
   const fieldsPickup = [
@@ -829,6 +829,7 @@ export default function CompanyProfile() {
           completion_date: formData.completion_date,
           completion_note: formData.completion_note,
           package_rate: formData.package_rate,
+          receive_amount: formData.receive_amount,
         }),
       });
       const result = await res.json();

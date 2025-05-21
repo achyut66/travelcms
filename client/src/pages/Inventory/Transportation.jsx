@@ -5,9 +5,17 @@ import DynamicModal from "../../components/Modal.jsx";
 import ViewModal from "../../components/ViewModal.jsx";
 import Table from "../../components/Table.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlus,
+  faPen,
+  faTrash,
+  faWrench,
+  faRandom,
+} from "@fortawesome/free-solid-svg-icons";
 import EButton from "../../components/EditBtn.jsx";
 import DButton from "../../components/DangerBtn.jsx";
+import PUButton from "../../components/PUButton.jsx";
+import SButton from "../../components/SubmitBtn.jsx";
 import Breadcrumb from "../../components/Breadscrum.jsx";
 import { toast } from "react-toastify";
 
@@ -22,6 +30,12 @@ export default function TransportationSetting() {
   const [editFormData, setEditFormData] = useState(null); // to hold fetched data
 
   const fields = [
+    {
+      name: "company_name",
+      label: "Owner's Name",
+      type: "text",
+      defaultValue: "",
+    },
     {
       name: "vehicle_type",
       label: "Vehicle Type",
@@ -39,8 +53,10 @@ export default function TransportationSetting() {
   // Table data columns
   const columns = [
     { key: "index", label: "S.no" },
+    { key: "company_name", label: "Owner's Name" },
     { key: "vehicle_type", label: "Vehicle Type" },
     { key: "vehicle_number", label: "Vehicle Number" },
+    { key: "is_available", label: "Is Available ?", type: "boolean" },
   ];
   // useeffect
   useEffect(() => {
@@ -74,6 +90,20 @@ export default function TransportationSetting() {
           className="text-gray-500"
           label={<FontAwesomeIcon icon={faTrash} />}
           onClick={() => handleDelete(row._id)} // or row.id based on your data
+        />
+        &nbsp;
+        <PUButton
+          className="text-gray-500"
+          label={<FontAwesomeIcon icon={faWrench} />}
+          onClick={() => handleMaintainance(row._id)} // or row.id based on your data
+          tooltip={"If Sent For Maintainance"}
+        />
+        &nbsp;
+        <SButton
+          className="text-gray-500"
+          label={<FontAwesomeIcon icon={faRandom} />}
+          onClick={() => handleMaintainanceReturn(row._id)} // or row.id based on your data
+          tooltip={"Return After Maintainance"}
         />
       </>
     );
@@ -134,6 +164,7 @@ export default function TransportationSetting() {
       console.error("Failed to fetch data for edit:", error);
     }
   };
+
   const handleDelete = async (id) => {
     if (!window.confirm("You really want to delete?")) return;
     try {
@@ -143,6 +174,37 @@ export default function TransportationSetting() {
 
       const data = await res.json();
       toast.error(data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      console.error("Error deleting purpose:", error);
+    }
+  };
+
+  const handleMaintainance = async (id) => {
+    if (!window.confirm("Is Vehicle Sent For Maintainance ?")) return;
+    try {
+      const res = await fetch(`/api/vehicle-status/${id}`, {
+        method: "GET",
+      });
+      const data = await res.json();
+      toast.error(data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      console.error("Error deleting purpose:", error);
+    }
+  };
+  const handleMaintainanceReturn = async (id) => {
+    if (!window.confirm("Is Vehicle Return After Maintainance ?")) return;
+    try {
+      const res = await fetch(`/api/vehicle-status-return/${id}`, {
+        method: "GET",
+      });
+      const data = await res.json();
+      toast.success(data.message);
       setTimeout(() => {
         window.location.reload();
       }, 2000);
@@ -184,14 +246,14 @@ export default function TransportationSetting() {
         <DynamicModal
           visible={isModalVisible}
           onClose={() => setIsModalVisible(false)}
-          title="Add Purpose Of Visit"
+          title="Add Vehicle Information"
           fields={fields}
           onSubmit={handleModalSubmit}
         />
         <DynamicModal
           visible={isEditModalVisible}
           onClose={() => setIsEditModalVisible(false)}
-          title="Edit Purpose Of Visit"
+          title="Edit Vehicle Information"
           fields={fields}
           onSubmit={handleEditModalSubmit}
           id={selectedId}

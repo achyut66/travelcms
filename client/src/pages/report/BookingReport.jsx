@@ -30,7 +30,7 @@ export default function BookingReport() {
     { key: "3", label: "Cancelled", data: isCancelled },
     { key: "2", label: "Completed", data: isCompleted },
   ];
-
+  // console.log(data);
   // Fetch data from the server
   const fetchData = async () => {
     try {
@@ -126,6 +126,8 @@ export default function BookingReport() {
     { key: "pax_no", label: "Pax No" },
     { key: "extra_total", label: "Extras" },
     { key: "package_total", label: "Package" },
+    { key: "receive_amount", label: "Received" },
+    { key: "due_amount", label: "Dues" },
     {
       key: "flag",
       label: "Booking Status",

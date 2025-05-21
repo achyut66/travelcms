@@ -74,7 +74,7 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
 
     return statusMap[status] || "bg-red-300 text-gray-800";
   };
-
+  // console.log(searchResults);
   // Data processing
   const displayedData = searchResults !== null ? searchResults : data;
   const totalItems = displayedData.length;
@@ -127,7 +127,7 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
                 key={`row-${idx}`}
                 className="hover:bg-gray-200 border-gray-200 border-[1px]"
               >
-                {/* {console.log(row.flag)} */}
+                {/* {console.log(row.is_available)} */}
                 {columns.map((col) => {
                   let displayValue = "--";
 
@@ -154,6 +154,20 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
                     } else if (col.key === "itinerary") {
                       // Custom rendering for itinerary
                       displayValue = row.itinerary.join(", ");
+                    } else if (col.key === "is_available") {
+                      displayValue = (
+                        <div
+                          className={`px-2 py-1 inline-block rounded text-white text-xs ${
+                            row.is_available === "1"
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                          }`}
+                        >
+                          {row.is_available === "1"
+                            ? "Available"
+                            : "Not Available"}
+                        </div>
+                      );
                     } else if (cellValue) {
                       displayValue = cellValue;
                     }

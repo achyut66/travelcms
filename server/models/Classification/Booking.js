@@ -33,6 +33,9 @@ const bookingSchema = new mongoose.Schema({
   
   extra_total: {type:Number},
   package_total: {type:Number},
+  receive_amount: {type:Number },
+  due_amount: {type:Number },
+  
 
 }, { timestamps: true });
 

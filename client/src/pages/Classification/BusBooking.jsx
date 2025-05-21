@@ -436,7 +436,6 @@ export default function VehicleBooking() {
   const handleModalSubmit = async (formData) => {
     try {
       const formPayload = new FormData();
-      console.log(formData);
       const excludedTravellerKeys = ["pax_details"];
       Object.entries(formData).forEach(([key, value]) => {
         if (!excludedTravellerKeys.includes(key)) {
@@ -608,7 +607,6 @@ export default function VehicleBooking() {
     try {
       const res = await fetch(`/api/get-flightbooking-with-travellers/${id}`);
       const data = await res.json();
-      console.log(data);
       if (data.data) {
         setViewReceiptFormData(data.data);
         setReceiptTravellerData(data.data.travellers);

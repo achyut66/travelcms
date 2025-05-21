@@ -128,7 +128,6 @@ const DashboardNotification = () => {
   ];
 
   const handlePickUp = async (id, formData) => {
-    // console.log(id);
     try {
       const res = await fetch("/api/pickup-register", {
         method: "POST",
@@ -146,6 +145,9 @@ const DashboardNotification = () => {
       });
       const result = await res.json();
       toast.success(result.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
       setIsPickUpModalVisible(false);
     } catch (error) {
       console.error("Error completing booking:", error);
