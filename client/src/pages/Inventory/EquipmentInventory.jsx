@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../components/VButton.jsx";
 import Layout from "../../layouts/Layout.jsx";
-import DynamicModal from "../../components/Modal.jsx";
+import DynamicModal from "../../components/EquipmentModal.jsx";
 import Table from "../../components/Table.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -48,6 +48,18 @@ export default function EquipmentSetting() {
           label: "Quantity",
           type: "number",
           placeholder: "Qty",
+        },
+        {
+          name: "rate",
+          label: "Rate",
+          type: "number",
+          placeholder: "Rate",
+        },
+        {
+          name: "total_amt",
+          label: "Total",
+          type: "number",
+          placeholder: "Total",
         },
       ],
     },
@@ -135,6 +147,8 @@ export default function EquipmentSetting() {
         const dataToSend = {
           equipment_name: equip.equipment_name,
           number: equip.number,
+          rate: equip.rate,
+          total_amt: equip.total_amt,
         };
 
         const res = await fetch("/api/equipment-register", {

@@ -8,15 +8,17 @@ const router = express.Router();
 // Inside your route handler
 router.post('/equipment-register', async (req, res) => {
     try {
-      const { equipment_name,number } = req.body;
+      const { equipment_name,number,rate,total_amt } = req.body;
       const is_available = 1;
-      if (!equipment_name || !number || !is_available ) {
+      if (!equipment_name || !number || !is_available || !total_amt || !rate ) {
         return res.status(400).json({ message: "Missing required fields." });
       }
       const newEquip = new equipmentDetails({
         equipment_name,
         number,
         is_available,
+        total_amt,
+        rate,
       });
       await newEquip.save();
       res.status(201).json({ message: "Eqipment Datas saved successfully.", data: newEquip });
