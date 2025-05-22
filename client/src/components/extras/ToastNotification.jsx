@@ -156,7 +156,6 @@ const DashboardNotification = () => {
   };
 
   const handleNotificationClick = (id) => {
-    console.log(id);
     setSelectedId(id);
     setIsPickUpModalVisible(true);
   };
@@ -178,7 +177,6 @@ const DashboardNotification = () => {
             <div className="text-center font-semibold text-gray-800 text-md mb-3 border-b pb-1">
               🚐 Upcoming Pickups
             </div>
-            {console.log(notifications)}
             {notifications.length === 0 ? (
               <p className="text-sm text-gray-500 text-center">
                 No upcoming pickups.

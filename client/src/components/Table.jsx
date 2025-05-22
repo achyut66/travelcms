@@ -168,6 +168,14 @@ const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
                             : "Not Available"}
                         </div>
                       );
+                    } else if (col.key === "damaged") {
+                      displayValue = (
+                        <div
+                          className={`px-2 py-1 inline-block rounded text-white text-xs bg-red-500`}
+                        >
+                          {row.damaged || 0}
+                        </div>
+                      );
                     } else if (cellValue) {
                       displayValue = cellValue;
                     }

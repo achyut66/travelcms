@@ -26,6 +26,7 @@ export default function EquipmentSetting() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isDamageModalVisible, setIsDamageModalVisible] = useState(false);
 
   const [selectedId, setSelectedId] = useState(null);
   const [editFormData, setEditFormData] = useState(null); // to hold fetched data
@@ -68,15 +69,43 @@ export default function EquipmentSetting() {
   const editFeilds = [
     {
       name: "equipment_name",
-      lable: "Item Name",
+      label: "Items",
       type: "text",
-      placeholder: "name",
+      placeholder: "Items",
     },
     {
       name: "number",
-      type: "string",
-      label: "Qty",
+      label: "Quantity",
+      type: "number",
       placeholder: "Qty",
+    },
+    {
+      name: "rate",
+      label: "Rate",
+      type: "number",
+      placeholder: "Rate",
+    },
+    {
+      name: "total_amt",
+      label: "Total",
+      type: "number",
+      placeholder: "Total",
+    },
+  ];
+
+  // damage
+  const damageFields = [
+    {
+      name: "no_of_items",
+      label: "Number of Damage Pieces",
+      type: "number",
+      placeholder: "No of damage pieces",
+    },
+    {
+      name: "reason",
+      label: "Reason",
+      type: "text",
+      placeholder: "Reason",
     },
   ];
   // Table data columns
@@ -84,6 +113,7 @@ export default function EquipmentSetting() {
     { key: "index", label: "S.no" },
     { key: "equipment_name", label: "Equipment Name" },
     { key: "number", label: "No. Of Items" },
+    { key: "damaged", label: "Total Damaged", type: "boolean" },
     { key: "is_available", label: "If Damaged ?", type: "boolean" },
   ];
   // useeffect
@@ -112,6 +142,7 @@ export default function EquipmentSetting() {
           className="text-green-500"
           label={<FontAwesomeIcon icon={faPen} />}
           onClick={() => handleEdit(row._id)} // or row.id based on your data
+          disabled={Number(row.damaged) > 0}
         />
         &nbsp;
         <DButton
@@ -184,7 +215,7 @@ export default function EquipmentSetting() {
         },
         body: JSON.stringify(updatedData),
       });
-
+      // console.log(updatedData);
       const result = await response.json();
       toast.warn(result.message);
       setTimeout(() => {
@@ -228,19 +259,44 @@ export default function EquipmentSetting() {
     }
   };
 
-  const handleMaintainance = async (id) => {
-    if (!window.confirm("If Eqipment Is Damaged ?")) return;
+  const handleMaintainance = (id) => {
+    setSelectedId(id); // Set the current equipment ID
+    setIsDamageModalVisible(true); // Show the modal
+  };
+
+  const handleDamageModalSubmit = async (formData) => {
     try {
-      const res = await fetch(`/api/check-flag/${id}`, {
-        method: "GET",
+      // Merge selectedId into formData
+      const payload = {
+        ...formData,
+        equip_id: selectedId, // or formData.equip_id if it's already included
+      };
+
+      const res = await fetch(`/api/equipment-damage-register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
+
       const data = await res.json();
-      toast.error(data.message);
+
+      if (!res.ok) {
+        toast.error(data.message || "Failed to save equipment damage info.");
+        return;
+      }
+
+      toast.success(data.message || "Damage info saved successfully!");
+      setIsDamageModalVisible(false);
+
+      // Optional: Refresh page or refetch data
       setTimeout(() => {
         window.location.reload();
-      }, 2000);
+      }, 1500);
     } catch (error) {
-      console.error("Error deleting purpose:", error);
+      console.error("Error submitting damage data:", error);
+      toast.error("An unexpected error occurred.");
     }
   };
 
@@ -313,6 +369,14 @@ export default function EquipmentSetting() {
           onSubmit={handleEditModalSubmit}
           id={selectedId}
           defaultValues={editFormData}
+        />
+        <DynamicModal
+          visible={isDamageModalVisible}
+          onClose={() => setIsDamageModalVisible(false)}
+          title="Damage Equipment Information"
+          id={selectedId}
+          fields={damageFields}
+          onSubmit={handleDamageModalSubmit}
         />
       </Layout>
     </>

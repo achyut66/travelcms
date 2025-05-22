@@ -306,7 +306,19 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                 <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200">
                   <Link to="/account/annual-account-report">
                     <FontAwesomeIcon icon={faFileAlt} />
-                    &nbsp;Annual Accounting
+                    &nbsp;Package Account
+                  </Link>
+                </li>
+                {/* <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
+                  <Link to="#">
+                    <FontAwesomeIcon icon={faFileAlt} />
+                    &nbsp;Flight Account
+                  </Link>
+                </li> */}
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
+                  <Link to="/account/inventory-equipment">
+                    <FontAwesomeIcon icon={faFileAlt} />
+                    &nbsp;Equip. Account
                   </Link>
                 </li>
               </ul>

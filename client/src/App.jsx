@@ -32,6 +32,7 @@ import FlightBookingInfo from "./pages/Classification/FlightBooking";
 import VehicleBooking from "./pages/Classification/BusBooking";
 import EquipmentSetting from "./pages/Inventory/EquipmentInventory";
 import AccountReport from "./pages/Account/AnnualAccountReport";
+import EquipReport from "./pages/Account/EquipmentInventory";
 
 // reports package
 import BookingReport from "./pages/report/BookingReport";
@@ -97,6 +98,7 @@ export default function App() {
           path="/account/annual-account-report"
           element={<AccountReport />}
         />
+        <Route path="/account/inventory-equipment" element={<EquipReport />} />
       </Routes>
     </>
   );

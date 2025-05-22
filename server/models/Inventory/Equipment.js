@@ -6,6 +6,8 @@ const equipmentSchema = new mongoose.Schema({
   rate: {type:Number},
   total_amt: {type:Number},
   is_available:{type:String,required:true},
+  damaged:{type:Number},
+  available:{type:Number},
   
 },{ timestamps: true });
 

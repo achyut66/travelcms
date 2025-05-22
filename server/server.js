@@ -30,6 +30,7 @@ import assignPickup from './routes/Classification/assignpickup.js';
 import extrasSettings from './routes/Classification/extras.js';
 import receiptProfile from "./routes/Classification/receiptprint.js";
 import equipmentDetails from "./routes/Inventory/equipment.js";
+import equipDamageDetails from "./routes/Inventory/equipmentDamage.js";
 
 
 dotenv.config();
@@ -92,6 +93,7 @@ app.use("/api", assignPickup);
 app.use("/api", extrasSettings);
 app.use("/api", receiptProfile);
 app.use("/api", equipmentDetails);
+app.use("/api", equipDamageDetails);
 
 // Serve static files (uploads/images etc.)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

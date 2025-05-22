@@ -10,6 +10,7 @@ router.post('/equipment-register', async (req, res) => {
     try {
       const { equipment_name,number,rate,total_amt } = req.body;
       const is_available = 1;
+      const available = number;
       if (!equipment_name || !number || !is_available || !total_amt || !rate ) {
         return res.status(400).json({ message: "Missing required fields." });
       }
@@ -19,6 +20,7 @@ router.post('/equipment-register', async (req, res) => {
         is_available,
         total_amt,
         rate,
+        available,
       });
       await newEquip.save();
       res.status(201).json({ message: "Eqipment Datas saved successfully.", data: newEquip });
@@ -27,18 +29,33 @@ router.post('/equipment-register', async (req, res) => {
       res.status(500).json({ message: "Server Error" });
     }
   });
-  
-  // Get All Nationalities
- // Fetch itineraries grouped by package_name
+  // equipment
  router.get('/equipment-data', async (req, res) => {
     try {
       const extras = await equipmentDetails.find();
-      res.status(200).json(extras); // Send the updated data with company names
+      res.status(200).json(extras);
     } catch (error) {
       console.error('GET /equipment-data error:', error);
       res.status(500).json({ message: 'Unable to fetch equipment data' });
     }
   });
+ router.get('/get-equipment-data-total', async (req, res) => {
+  try {
+    const extras = await equipmentDetails.find();
+    const damaged_item_amt = extras.map(item => (item.damaged || 0) * (item.rate || 0));
+    const remaining_item_amt = extras.map(item => (item.available || 0) * (item.rate || 0));
+
+    res.status(200).json({
+      extras,
+      damaged_item_amt,
+      remaining_item_amt
+    });
+  } catch (error) {
+    console.error('GET /equipment-data error:', error);
+    res.status(500).json({ message: 'Unable to fetch equipment data' });
+  }
+});
+
 // delete
 router.delete('/equipment-profile/:id', async (req, res) => {
     const { id } = req.params;
@@ -73,28 +90,25 @@ router.get('/equipment-data-id/:id', async (req, res) => {
 // Update Extra by ID
 router.put('/equipment-update/:id', async (req, res) => {
     const { id } = req.params;
-    const { equipment_name,number,is_available } = req.body;
-  
-    // Validate required fields
-    if (!equipment_name || !number || !is_available) {
+    const { equipment_name,number,is_available=1,rate,total_amt } = req.body;
+    if (!equipment_name || !number || !is_available || !rate || !total_amt) {
       return res.status(400).json({ message: "Missing required fields." });
     }
-  
     try {
       const updatedExtra = await equipmentDetails.findByIdAndUpdate(
         id,
         {
           equipment_name,
           number,
+          rate,
+          total_amt,
           is_available,
         },
         { new: true } // Return the updated document
       );
-  
       if (!updatedExtra) {
         return res.status(404).json({ message: "Equipment not found." });
       }
-  
       res.status(200).json({ message: "Equipment updated successfully.", data: updatedExtra });
     } catch (error) {
       console.error(`PUT /equipment-update/${id} error:`, error);

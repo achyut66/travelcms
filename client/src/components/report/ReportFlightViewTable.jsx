@@ -296,7 +296,9 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
               <td colSpan={8} className="text-center text-lg font-bold">
                 Total
               </td>
-              <td className="text-center font-bold">{rateTotal}</td>
+              <td className="text-center font-bold bg-green-400">
+                NPR. {rateTotal.toLocaleString("en-IN")}
+              </td>
               <td>&nbsp;</td>
             </tr>
           </tbody>

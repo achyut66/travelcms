@@ -9,20 +9,23 @@ import logo from "../../../public/images/logo.png";
 import "../../../src/index.css";
 import "../../../src/assets/css/pdf.css";
 
-const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
+const Table = ({
+  columns,
+  data,
+  actions,
+  itemsPerPage = 20,
+  year,
+  onCountClick,
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState(data);
   const tableRef = useRef();
   const [userData, setUserData] = useState([]);
-
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [fromDate, setFromDate] = useState(null);
-  const [toDate, setToDate] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState("");
-
+  // console.log(year);
+  //   console.log(data);
   const handleSearch = (e) => {
     e.preventDefault();
-    applyFilters();
+    // applyFilters();
   };
 
   useEffect(() => {
@@ -38,22 +41,22 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
     fetchProfile();
   }, []);
 
-  const applyFilters = async () => {
-    const params = new URLSearchParams();
+  //   const applyFilters = async () => {
+  //     const params = new URLSearchParams();
 
-    if (selectedStatus) params.append("status", selectedStatus);
-    if (selectedColumn) params.append("column", selectedColumn);
-    if (fromDate) params.append("from", fromDate.toISOString().split("T")[0]);
-    if (toDate) params.append("to", toDate.toISOString().split("T")[0]);
+  //     if (selectedStatus) params.append("status", selectedStatus);
+  //     if (selectedColumn) params.append("column", selectedColumn);
+  //     if (fromDate) params.append("from", fromDate.toISOString().split("T")[0]);
+  //     if (toDate) params.append("to", toDate.toISOString().split("T")[0]);
 
-    const response = await fetch(
-      `${API_BASE_URL}/api/filter-by-date?${params}`
-    );
-    const result = await response.json();
+  //     const response = await fetch(
+  //       `${API_BASE_URL}/api/filter-by-date?${params}`
+  //     );
+  //     const result = await response.json();
 
-    setFilteredData(result);
-    setCurrentPage(1);
-  };
+  //     setFilteredData(result);
+  //     setCurrentPage(1);
+  //   };
 
   const handlePrint = () => {
     const input = tableRef.current;
@@ -84,8 +87,6 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
         </body>
       </html>
     `);
-    // printWindow.document.write(input.outerHTML);
-    // printWindow.document.write("</body></html>");
     printWindow.document.close();
     printWindow.print();
   };
@@ -127,21 +128,21 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
 
   // total
   const extratotal = filteredData.reduce(
-    (sum, row) => sum + (+row.extra_total || 0),
+    (sum, row) => sum + (+row.total_amt || 0),
     0
   );
   const receivetotal = filteredData.reduce(
-    (sum, row) => sum + (+row.receive_amount || 0),
+    (sum, row) => sum + (+row.damagedprice || 0),
     0
   );
   const duestotal = filteredData.reduce(
-    (sum, row) => sum + (+row.due_amount || 0),
+    (sum, row) => sum + (+row.availableprice || 0),
     0
   );
-  const packagetotal = filteredData.reduce(
-    (sum, row) => sum + (+row.package_total || 0),
-    0
-  );
+  //   const packagetotal = filteredData.reduce(
+  //     (sum, row) => sum + (+row.receive_amount || 0),
+  //     0
+  //   );
 
   return (
     <div className="overflow-x-auto w-full">
@@ -149,57 +150,12 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
       <form
         onSubmit={handleSearch}
         className="mb-4 flex flex-wrap gap-4 items-end"
-      >
-        <div>
-          <label className="block text-sm mb-1">Filter Status</label>
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="border px-2 py-1 text-sm rounded"
-          >
-            <option value="">-- Select Status --</option>
-            {filterData.map((status) => (
-              <option key={status.key} value={status.key}>
-                {status.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">From Date</label>
-          <DatePicker
-            selected={fromDate}
-            onChange={(date) => setFromDate(date)}
-            dateFormat="yyyy-MM-dd"
-            className="border px-2 py-1 text-sm rounded"
-            placeholderText="Select start date"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">To Date</label>
-          <DatePicker
-            selected={toDate}
-            onChange={(date) => setToDate(date)}
-            dateFormat="yyyy-MM-dd"
-            className="border px-2 py-1 text-sm rounded"
-            placeholderText="Select end date"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer text-sm"
-        >
-          Search
-        </button>
-      </form>
+      ></form>
 
       <div className="flex gap-2 mb-4">
         <button
           onClick={handlePrint}
-          className="px-4 py-4 bg-green-600 text-white rounded text-sm ml-[1170px] mt-[-60px] cursor-pointer"
+          className="px-4 py-4 bg-green-600 text-white rounded text-sm ml-[1170px] cursor-pointer"
         >
           <FontAwesomeIcon icon={faPrint} className="mr-2" />
         </button>
@@ -216,6 +172,11 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
               </div>
               <div>{userData[0].company_address}</div>
               <div>Nepal</div>
+              {year.map((y, index) => (
+                <p key={index}>
+                  ( The Annual Accounting Report For The Year {y} )
+                </p>
+              ))}
             </>
           )}
         </div>
@@ -248,7 +209,19 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
                   >
                     {columns.map((col) => {
                       let displayValue = "--";
-
+                      // console.log(col);
+                      if (col.key === "count") {
+                        return (
+                          <td key={`${col.key}-${idx}`} className="text-center">
+                            <button
+                              className="text-lg text-blue-500 px-2 py-1 rounded cursor-pointer"
+                              onClick={() => onCountClick(row.ids)} // This must be an array of ObjectIds
+                            >
+                              {row.count}
+                            </button>
+                          </td>
+                        );
+                      }
                       if (col.key === "index") {
                         displayValue =
                           (currentPage - 1) * itemsPerPage + idx + 1;
@@ -304,22 +277,20 @@ const Table = ({ columns, data, actions, itemsPerPage = 20, filterData }) => {
               </tr>
             )}
             <tr>
-              <td colSpan={8} className="text-center text-lg font-bold">
+              <td colSpan={3} className="text-center text-lg font-bold">
                 Total
               </td>
-              <td className="text-center font-bold bg-gray-300">
-                NPR. {extratotal.toLocaleString("en-IN")}
-              </td>
               <td className="text-center font-bold bg-yellow-300">
-                NPR. {packagetotal.toLocaleString("en-IN")}
-              </td>
-              <td className="text-center font-bold bg-green-400">
-                NPR. {receivetotal.toLocaleString("en-IN")}
-              </td>
-              <td className="text-center font-bold bg-red-500">
-                NPR. ({duestotal.toLocaleString("en-IN")})
+                NPR.{extratotal.toLocaleString("en-IN")}
               </td>
               <td>&nbsp;</td>
+              <td className="text-center font-bold bg-red-400">
+                NPR. ({receivetotal.toLocaleString("en-IN")})
+              </td>
+              <td>&nbsp;</td>
+              <td className="text-center font-bold bg-green-400">
+                NPR. {duestotal.toLocaleString("en-IN")}
+              </td>
             </tr>
           </tbody>
         </table>
