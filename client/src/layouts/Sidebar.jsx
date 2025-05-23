@@ -392,12 +392,12 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                     &nbsp;&nbsp;Language
                   </Link>
                 </li>
-                {/* <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
-                  <Link to="/settings/transportation">
+                <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
+                  <Link to="/settings/inclusion-details">
                     <FontAwesomeIcon icon={faCog} />
-                    &nbsp;&nbsp;Vehicle
+                    &nbsp;&nbsp;Inclusion
                   </Link>
-                </li> */}
+                </li>
                 <li className="cursor-pointer hover:text-gray-100 hover:bg-gray-500 px-1 py-1 rounded-lg transition duration-200 mt-[-6px]">
                   <Link to="/settings/flight">
                     <FontAwesomeIcon icon={faCog} />

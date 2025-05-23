@@ -33,6 +33,7 @@ import VehicleBooking from "./pages/Classification/BusBooking";
 import EquipmentSetting from "./pages/Inventory/EquipmentInventory";
 import AccountReport from "./pages/Account/AnnualAccountReport";
 import EquipReport from "./pages/Account/EquipmentInventory";
+import InclusionSetting from "./pages/Settings/Inclusion";
 
 // reports package
 import BookingReport from "./pages/report/BookingReport";
@@ -99,6 +100,10 @@ export default function App() {
           element={<AccountReport />}
         />
         <Route path="/account/inventory-equipment" element={<EquipReport />} />
+        <Route
+          path="/settings/inclusion-details"
+          element={<InclusionSetting />}
+        />
       </Routes>
     </>
   );
