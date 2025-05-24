@@ -1,0 +1,449 @@
+import React, { Fragment, useEffect, useState, forwardRef } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import Select from "react-select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+const DynamicModal = ({
+  visible,
+  onClose,
+  title,
+  fields,
+  onSubmit,
+  defaultValues,
+  bookingId,
+}) => {
+  const [formData, setFormData] = useState({});
+  const CustomInput = forwardRef(({ value, onClick, placeholder }, ref) => (
+    <input
+      ref={ref}
+      value={value}
+      onClick={onClick}
+      placeholder={placeholder}
+      className="block w-full border border-gray-300 rounded-md p-2"
+      readOnly
+    />
+  ));
+  const inclusionField = fields.find((f) => f.name === "inclusion_ids");
+  const exclusionField = fields.find((f) => f.name === "exclusion_ids");
+
+  useEffect(() => {
+    if (visible && defaultValues) {
+      const initialData = {};
+      fields.forEach((field) => {
+        if (field.type === "group" && field.allowMultiple) {
+          initialData[field.name] = defaultValues[field.name] || [{}];
+        } else if (field.allowMultiple) {
+          initialData[field.name] = defaultValues[field.name] || [""];
+        } else {
+          initialData[field.name] = field.multiple
+            ? defaultValues[field.name] || []
+            : defaultValues[field.name] || "";
+        }
+      });
+      setFormData(initialData);
+    }
+  }, [visible, fields, defaultValues]);
+
+  const handleChange = (e, index = null) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      if (index !== null) {
+        const updatedArray = [...prev[name]];
+        updatedArray[index] = value;
+        return { ...prev, [name]: updatedArray };
+      } else {
+        return { ...prev, [name]: value };
+      }
+    });
+  };
+
+  const handleAddMore = (name, isGroup = false) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: [...(prev[name] || []), isGroup ? {} : ""],
+    }));
+  };
+
+  const handleRemove = (name, index) => {
+    setFormData((prev) => {
+      const updatedArray = [...(prev[name] || [])];
+      updatedArray.splice(index, 1);
+      return { ...prev, [name]: updatedArray };
+    });
+  };
+
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: files[0] }));
+  };
+
+  const handleSubmit = () => {
+    onSubmit(formData, bookingId);
+    onClose();
+  };
+
+  return (
+    <Transition appear show={visible} as={Fragment}>
+      <Dialog as="div" className="relative z-[9999]" onClose={onClose}>
+        <div className="fixed inset-0 bg-black opacity-30" />
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <Transition.Child
+              as={Fragment}
+              enter="transform transition duration-300"
+              enterFrom="translate-x-full opacity-0"
+              enterTo="translate-x-0 opacity-100"
+              leave="transform transition duration-200"
+              leaveFrom="translate-x-0 opacity-100"
+              leaveTo="-translate-x-full opacity-0"
+            >
+              <Dialog.Panel className="w-[800px] transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Title
+                  as="h3"
+                  className="text-lg font-medium leading-6 text-gray-900 text-center"
+                >
+                  {title}
+                </Dialog.Title>
+                <div className="mt-4 space-y-4">
+                  {fields
+                    .filter(
+                      (field) =>
+                        !["inclusion_ids", "exclusion_ids"].includes(field.name)
+                    )
+                    .map((field) => {
+                      const value = formData[field.name];
+
+                      if (field.type === "group" && field.allowMultiple) {
+                        return (
+                          <div key={field.name}>
+                            <label className="block text-sm font-medium text-gray-700">
+                              {field.label}
+                            </label>
+                            {(value || []).map((entry, idx) => (
+                              <div key={idx} className="flex gap-2 mb-2">
+                                {field.fields.map((subField) => (
+                                  <input
+                                    key={subField.name}
+                                    type={subField.type}
+                                    placeholder={subField.placeholder}
+                                    value={entry[subField.name] || ""}
+                                    onChange={(e) => {
+                                      const updatedGroup = [...value];
+                                      updatedGroup[idx][subField.name] =
+                                        e.target.value;
+                                      setFormData((prev) => ({
+                                        ...prev,
+                                        [field.name]: updatedGroup,
+                                      }));
+                                    }}
+                                    className="block w-full border border-gray-300 rounded-md p-2"
+                                  />
+                                ))}
+                                <button
+                                  type="button"
+                                  className="bg-red-500 text-white px-2 rounded"
+                                  onClick={() => handleRemove(field.name, idx)}
+                                >
+                                  X
+                                </button>
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              className="mt-2 bg-green-500 text-white px-4 py-1 rounded"
+                              onClick={() => handleAddMore(field.name, true)}
+                            >
+                              + Add
+                            </button>
+                          </div>
+                        );
+                      }
+
+                      if (field.allowMultiple) {
+                        return (
+                          <div key={field.name}>
+                            <label className="block text-sm font-medium text-gray-700">
+                              {field.label}
+                            </label>
+                            {(value || []).map((val, idx) => (
+                              <div key={idx} className="flex gap-2 mt-1">
+                                <input
+                                  type="text"
+                                  value={val}
+                                  onChange={(e) => handleChange(e, idx)}
+                                  className="block w-full border border-gray-300 rounded-md p-2"
+                                />
+                                <button
+                                  type="button"
+                                  className="bg-red-500 text-white px-2 rounded"
+                                  onClick={() => handleRemove(field.name, idx)}
+                                >
+                                  X
+                                </button>
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              className="mt-2 bg-green-500 text-white px-4 py-1 rounded"
+                              onClick={() => handleAddMore(field.name)}
+                            >
+                              + Add
+                            </button>
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "select2") {
+                        return (
+                          <div key={field.name}>
+                            <label className="block text-sm font-medium text-gray-700">
+                              {field.label}
+                            </label>
+                            <Select
+                              isMulti={field.multiple}
+                              name={field.name}
+                              options={field.options}
+                              value={
+                                field.multiple
+                                  ? field.options.filter((opt) =>
+                                      (value || []).includes(opt.value)
+                                    )
+                                  : field.options.find(
+                                      (opt) => opt.value === value
+                                    ) || null
+                              }
+                              onChange={(selected) => {
+                                const selectedValue = field.multiple
+                                  ? selected.map((s) => s.value)
+                                  : selected?.value || "";
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  [field.name]: selectedValue,
+                                }));
+                              }}
+                              className="mt-1"
+                            />
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "date") {
+                        return (
+                          <div key={field.name}>
+                            <label className="block text-sm font-medium text-gray-700">
+                              {field.label}
+                            </label>
+                            <DatePicker
+                              selected={value ? new Date(value) : null}
+                              onChange={(date) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  [field.name]: date
+                                    ? date.toISOString().split("T")[0]
+                                    : "",
+                                }))
+                              }
+                              dateFormat="yyyy-MM-dd"
+                              placeholderText="Select date"
+                              popperPlacement="bottom-start"
+                              popperModifiers={[
+                                {
+                                  name: "preventOverflow",
+                                  options: { boundary: "viewport" },
+                                },
+                              ]}
+                              popperClassName="z-[99999]"
+                              portalId="root-portal"
+                              withPortal
+                              customInput={<CustomInput />}
+                            />
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div key={field.name}>
+                          <label className="block text-sm font-medium text-gray-700">
+                            {field.label}
+                          </label>
+                          <input
+                            type={field.type}
+                            name={field.name}
+                            value={
+                              field.type !== "file" ? value || "" : undefined
+                            }
+                            onChange={
+                              field.type === "file"
+                                ? handleFileChange
+                                : handleChange
+                            }
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                          />
+                        </div>
+                      );
+                    })}
+                </div>
+                &nbsp;
+                {inclusionField && exclusionField && (
+                  <div
+                    className="grid grid-cols-2 gap-4"
+                    key="inclusion-exclusion-row"
+                  >
+                    {/* Inclusions */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        {inclusionField.label}
+                      </label>
+                      {/* Check/Uncheck All Buttons */}
+                      <div className="flex gap-2 mb-2">
+                        <button
+                          type="button"
+                          className="text-xs text-blue-600 underline"
+                          onClick={() => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              [inclusionField.name]: inclusionField.options.map(
+                                (opt) => opt.value
+                              ),
+                            }));
+                          }}
+                        >
+                          Check All
+                        </button>
+                        <button
+                          type="button"
+                          className="text-xs text-blue-600 underline"
+                          onClick={() => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              [inclusionField.name]: [],
+                            }));
+                          }}
+                        >
+                          Uncheck All
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {inclusionField.options.map((option) => (
+                          <label
+                            key={option.value}
+                            className="flex items-center gap-1 text-xs"
+                          >
+                            <input
+                              type="checkbox"
+                              value={option.value}
+                              checked={(
+                                formData[inclusionField.name] || []
+                              ).includes(option.value)}
+                              onChange={(e) => {
+                                const newValues = new Set(
+                                  formData[inclusionField.name] || []
+                                );
+                                e.target.checked
+                                  ? newValues.add(option.value)
+                                  : newValues.delete(option.value);
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  [inclusionField.name]: [...newValues],
+                                }));
+                              }}
+                            />
+                            <span>{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Exclusions — same structure */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        {exclusionField.label}
+                      </label>
+                      {/* Check/Uncheck All Buttons */}
+                      <div className="flex gap-2 mb-2">
+                        <button
+                          type="button"
+                          className="text-xs text-blue-600 underline"
+                          onClick={() => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              [exclusionField.name]: exclusionField.options.map(
+                                (opt) => opt.value
+                              ),
+                            }));
+                          }}
+                        >
+                          Check All
+                        </button>
+                        <button
+                          type="button"
+                          className="text-xs text-blue-600 underline"
+                          onClick={() => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              [exclusionField.name]: [],
+                            }));
+                          }}
+                        >
+                          Uncheck All
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {exclusionField.options.map((option) => (
+                          <label
+                            key={option.value}
+                            className="flex items-center gap-1 text-xs"
+                          >
+                            <input
+                              type="checkbox"
+                              value={option.value}
+                              checked={(
+                                formData[exclusionField.name] || []
+                              ).includes(option.value)}
+                              onChange={(e) => {
+                                const newValues = new Set(
+                                  formData[exclusionField.name] || []
+                                );
+                                e.target.checked
+                                  ? newValues.add(option.value)
+                                  : newValues.delete(option.value);
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  [exclusionField.name]: [...newValues],
+                                }));
+                              }}
+                            />
+                            <span>{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="mt-6 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    className="bg-red-500 px-4 py-2 text-white rounded"
+                    onClick={onClose}
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-blue-600 px-4 py-2 text-white rounded"
+                    onClick={handleSubmit}
+                  >
+                    Save
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
+  );
+};
+
+export default DynamicModal;

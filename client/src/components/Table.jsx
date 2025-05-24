@@ -4,6 +4,7 @@ import Pagination from "../components/Pagination";
 import SearchComponent from "../components/Search";
 
 const Table = ({ columns, data, actions, itemsPerPage = 20 }) => {
+  // console.log(data);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchResults, setSearchResults] = useState(null);
   const [isSearching, setIsSearching] = useState(false);

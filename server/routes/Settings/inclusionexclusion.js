@@ -1,5 +1,5 @@
 import express from 'express';
-import inclusionSettings  from '../../models/Settings/InclusionEx.js';
+import packageInclusionSettings  from '../../models/Settings/PackageInclusion.js';
 
 const router = express.Router();
 
@@ -24,15 +24,15 @@ router.post('/inclusion-register', async (req, res) => {
       res.status(500).json({ message: "Server Error" });
     }
   });
-  // Get All Nationalities
- // Fetch itineraries grouped by package_name
- router.get('/inclusion-data', async (req, res) => {
+  
+ router.get('/inclusion-exclusion-data-by-package-name/:package_name', async (req, res) => {
+    const { package_name } = req.params;
     try {
-      const itineraries = await inclusionSettings.find();
+      const itineraries = await packageInclusionSettings.find({ package_name: package_name});
       res.status(200).json(itineraries);
     } catch (error) {
-      console.error('GET /inclusion-data error:', error);
-      res.status(500).json({ message: 'Unable to fetch itinerary data' });
+      console.error('GET /inclusion-exclusion-data-by-package-name error:', error);
+      res.status(500).json({ message: 'Unable to fetch items data' });
     }
   });
   

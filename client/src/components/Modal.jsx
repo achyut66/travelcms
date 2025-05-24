@@ -14,7 +14,6 @@ const DynamicModal = ({
   bookingId,
 }) => {
   const [formData, setFormData] = useState({});
-
   const CustomInput = forwardRef(({ value, onClick, placeholder }, ref) => (
     <input
       ref={ref}
@@ -25,6 +24,8 @@ const DynamicModal = ({
       readOnly
     />
   ));
+  const inclusionField = fields.find((f) => f.name === "inclusion_ids");
+  const exclusionField = fields.find((f) => f.name === "exclusion_ids");
 
   useEffect(() => {
     if (visible && defaultValues) {
@@ -217,6 +218,83 @@ const DynamicModal = ({
                           }}
                           className="mt-1"
                         />
+                      </div>
+                    ) : field.type === "checkbox-group" ? (
+                      <div
+                        className="grid grid-cols-2 gap-4"
+                        key="inclusion-exclusion-row"
+                      >
+                        {/* Inclusions */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            {inclusionField.label}
+                          </label>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {inclusionField.options.map((option) => (
+                              <label
+                                key={option.value}
+                                className="flex items-center gap-1"
+                              >
+                                <input
+                                  type="checkbox"
+                                  value={option.value}
+                                  checked={(
+                                    formData[inclusionField.name] || []
+                                  ).includes(option.value)}
+                                  onChange={(e) => {
+                                    const newValues = new Set(
+                                      formData[inclusionField.name] || []
+                                    );
+                                    e.target.checked
+                                      ? newValues.add(option.value)
+                                      : newValues.delete(option.value);
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      [inclusionField.name]: [...newValues],
+                                    }));
+                                  }}
+                                />
+                                <span>{option.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Exclusions */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            {exclusionField.label}
+                          </label>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {exclusionField.options.map((option) => (
+                              <label
+                                key={option.value}
+                                className="flex items-center gap-1"
+                              >
+                                <input
+                                  type="checkbox"
+                                  value={option.value}
+                                  checked={(
+                                    formData[exclusionField.name] || []
+                                  ).includes(option.value)}
+                                  onChange={(e) => {
+                                    const newValues = new Set(
+                                      formData[exclusionField.name] || []
+                                    );
+                                    e.target.checked
+                                      ? newValues.add(option.value)
+                                      : newValues.delete(option.value);
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      [exclusionField.name]: [...newValues],
+                                    }));
+                                  }}
+                                />
+                                <span>{option.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     ) : field.type === "date" ? (
                       <div key={field.name}>

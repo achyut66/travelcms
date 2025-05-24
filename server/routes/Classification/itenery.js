@@ -118,8 +118,7 @@ router.put('/itenery-profile/:id', async (req, res) => {
 
   // routes/yourRoutes.js
 router.get('/getby-packagename/:package_name', async (req, res) => {
-  const { package_name } = req.params; // ✅ Fix: match the route param name
-  console.log("Received package_name:", package_name);
+  const { package_name } = req.params;
 
   try {
     const itinerary = await itenerySettings.find({ package_name: package_name }); // ✅ Assumes DB field is `packageName`

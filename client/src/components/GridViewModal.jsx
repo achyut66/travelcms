@@ -18,8 +18,11 @@ const ViewModal = ({
   const [expandedImg, setExpandedImg] = useState(null);
   const [expandedInvoice, setExpandedInvoice] = useState(null);
   const [iteneryData, setIteneryData] = useState([]);
-  // console.log(displayColumns);
-  // console.log(iteneryData);
+
+  const [inclusionInfo, setInclusionInfo] = useState([]);
+  // const [exclusionInfo, setExclusionInfo] = useState([]);
+  // console.log(data.package_name);
+  // console.log(inclusionInfo);
   const fetchItinerary = async (packageName) => {
     try {
       const response = await fetch(`/api/getby-packagename/${packageName}`);
@@ -36,9 +39,30 @@ const ViewModal = ({
     }
   };
 
+  // package inclusion & exclusion
+  const getpackageInclusion = async (packageName) => {
+    // console.log(packageName);
+    try {
+      const response = await fetch(
+        `/api/inclusion-exclusion-data-by-package-name/${encodeURIComponent(
+          packageName
+        )}`
+      );
+      const result = await response.json();
+      if (response.ok) {
+        setInclusionInfo(result);
+      } else {
+        console.warn("No itinerary found:", result.message);
+      }
+    } catch (error) {
+      console.error("Error fetching itinerary:", error);
+    }
+  };
+
   useEffect(() => {
     if (data?.package_name) {
       fetchItinerary(data.package_name);
+      getpackageInclusion(data.package_name);
     }
   }, [data?.package_name]);
 
@@ -258,6 +282,45 @@ const ViewModal = ({
                           </li>
                         ))}
                       </ul>
+                      {/* inclusion exclusion feilds */}
+                      <div className="text-center font-bold text-red-600 mt-[12px]">
+                        Inclusions / Exclusions Details
+                      </div>
+                      <hr
+                        style={{
+                          width: "100%",
+                          borderWidth: "1px",
+                          color: "red",
+                          marginBottom: "20px",
+                        }}
+                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="underline">Inclusions</p>
+                          <ul>
+                            {inclusionInfo.map((itenery, idx) => (
+                              <li key={idx}>
+                                <div className="text-sm font-sm italic">
+                                  {itenery.inclusions_ids}
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="underline">Exclusions</p>
+                          <ul>
+                            {inclusionInfo.map((itenery, idx) => (
+                              <li key={idx}>
+                                <div className="text-sm font-sm italic">
+                                  {itenery.exclusions_ids}
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>

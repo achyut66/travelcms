@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../components/VButton.jsx";
 import Layout from "../../layouts/Layout.jsx";
-import DynamicModal from "../../components/Modal.jsx";
-import ViewModal from "../../components/ViewModal.jsx";
+import DynamicModal from "../../components/InclusionModal.jsx";
 import Table from "../../components/Table.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -17,6 +16,7 @@ export default function NationalitySetting() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [inclusionData, setInclusionData] = useState([]);
 
   const [selectedId, setSelectedId] = useState(null);
   const [editFormData, setEditFormData] = useState(null); // to hold fetched data
@@ -34,14 +34,33 @@ export default function NationalitySetting() {
       type: "text",
       defaultValue: "",
     },
+    {
+      name: "inclusion_ids",
+      label: "Inclusions",
+      type: "checkbox-group",
+      options: inclusionData.map((item) => ({
+        value: item.items_name,
+        label: item.items_name,
+      })),
+    },
+    {
+      name: "exclusion_ids",
+      label: "Exclusions",
+      type: "checkbox-group",
+      options: inclusionData.map((item) => ({
+        value: item.items_name,
+        label: item.items_name,
+      })),
+    },
   ];
-
+  // console.log(inclsuionData);
   // Table data columns
   const columns = [
     { key: "index", label: "S.no" },
     { key: "package", label: "Package" },
     { key: "rate", label: "Rate" },
   ];
+
   // useeffect
   useEffect(() => {
     const fetchData = async () => {
@@ -60,6 +79,22 @@ export default function NationalitySetting() {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchinclusion = async () => {
+      try {
+        const response = await fetch("/api/inclusion-data");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const result = await response.json();
+        setInclusionData(result);
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+    fetchinclusion();
   }, []);
 
   const renderActions = (row) => {
@@ -81,6 +116,7 @@ export default function NationalitySetting() {
   };
   // Handling submit form
   const handleModalSubmit = async (formData) => {
+    console.log(formData);
     try {
       const res = await fetch("/api/package-register", {
         method: "POST",

@@ -68,6 +68,7 @@ export default function CompanyProfile() {
 
   const [potterData, setPotterData] = useState([]);
   const [isReceiptModalVisible, setIsReceiptModalVisible] = useState(false);
+  // console.log(packageData);
 
   // package state
   const getPackageData = async () => {
@@ -79,6 +80,7 @@ export default function CompanyProfile() {
       console.error("Error fetching package:", error.message);
     }
   };
+
   const getPaymentMethodData = async () => {
     try {
       const response = await fetch("/api/payment-method-data");

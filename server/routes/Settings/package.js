@@ -1,33 +1,56 @@
 import express from 'express';
 import  packageSettings  from '../../models/Settings/Package.js';
+import packageInclusionSettings from '../../models/Settings/PackageInclusion.js';
+import extrasSettings from '../../models/Classification/Extras.js';
 
 const router = express.Router();
 
 // Create Nationality
 // Inside your route handler
 router.post('/package-register', async (req, res) => {
+  const { package: pkg, rate, inclusion_ids, exclusion_ids } = req.body;
 
-  const { package: pkg } = req.body;
-  const { rate } = req.body;
-
-  if (!pkg || typeof pkg !== 'string') {
-    return res.status(400).json({ message: 'Package is required and must be a string' });
-  }
-
-  if (!rate || typeof rate !== 'string') {
-    return res.status(400).json({ message: 'Rate is required and must be a string' });
+  if (!pkg || !rate) {
+    return res.status(400).json({ message: 'Package and rate are required' });
   }
 
   try {
-    const newNationality = new packageSettings({ package: pkg, rate }); // <-- FIXED HERE
-    await newNationality.save();
-    res.status(201).json({ message: 'Package added successfully !!!', data: newNationality });
+    const newPackageSettings = new packageSettings({
+      package: pkg,
+      rate,
+      inclusion_ids,
+      exclusion_ids,
+    });
+    await newPackageSettings.save();
+
+    const packageId = newPackageSettings._id.toString(); // Get the inserted ID
+    const documents = [];
+
+    const maxLength = Math.max(
+      inclusion_ids?.length || 0,
+      exclusion_ids?.length || 0
+    );
+
+    for (let i = 0; i < maxLength; i++) {
+      documents.push({
+        package_id: packageId,
+        package_name: pkg,
+        inclusions_ids: inclusion_ids?.[i] || null,
+        exclusions_ids: exclusion_ids?.[i] || null,
+      });
+    }
+
+    await packageInclusionSettings.insertMany(documents);
+
+    res.status(201).json({
+      message: 'Package added successfully!',
+      data: newPackageSettings,
+    });
   } catch (error) {
     console.error('POST /package-register error:', error);
     res.status(500).json({ message: 'Something went wrong while saving package' });
   }
 });
-
   
 // Get All Nationalities
 router.get('/package-data', async (req, res) => {
@@ -92,30 +115,55 @@ router.get('/get-rate-by-package/:package_name', async (req, res) => {
 // Update Nationality by ID
 router.put('/package-profile/:id', async (req, res) => {
   const { id } = req.params;
-  const { package:pkg,rate } = req.body;
+  const { package: pkg, rate, inclusion_ids, exclusion_ids } = req.body;
 
-  if (!pkg || typeof pkg !== 'string') {
-    return res.status(400).json({ message: 'Package is required and must be a string' });
-  }
-  if (!rate || typeof rate !== 'string') {
-    return res.status(400).json({ message: 'Package is required and must be a string' });
+  if (!pkg) {
+    return res.status(400).json({ message: 'Package is required' });
   }
 
   try {
-    const updatedNationality = await packageSettings.findByIdAndUpdate(
+    const updatedPackage = await packageSettings.findByIdAndUpdate(
       id,
-      { package:pkg,rate },
+      { package: pkg, rate, inclusion_ids, exclusion_ids },
       { new: true }
     );
 
-    if (!updatedNationality) {
-      return res.status(404).json({ message: 'Nationality not found' });
+    if (!updatedPackage) {
+      return res.status(404).json({ message: 'Package not found' });
     }
-    res.status(200).json({ message: 'Package updated successfully !!!', data: updatedNationality });
+
+    await packageInclusionSettings.deleteMany({ package_name: pkg });
+
+    const documents = [];
+
+    if (Array.isArray(inclusion_ids) || Array.isArray(exclusion_ids)) {
+      const maxLength = Math.max(
+        inclusion_ids?.length || 0,
+        exclusion_ids?.length || 0
+      );
+
+      for (let i = 0; i < maxLength; i++) {
+        documents.push({
+          package_id: id,
+          package_name: pkg,
+          inclusions_ids: inclusion_ids?.[i] || null,
+          exclusions_ids: exclusion_ids?.[i] || null,
+        });
+      }
+
+      await packageInclusionSettings.insertMany(documents);
+    }
+
+    res.status(200).json({
+      message: 'Package updated successfully!',
+      data: updatedPackage,
+    });
+
   } catch (error) {
     console.error(`PUT /package-profile/${id} error:`, error);
-    res.status(500).json({ message: 'Error updating nationality' });
+    res.status(500).json({ message: 'Error updating package' });
   }
 });
+
 
 export default router;

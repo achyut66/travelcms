@@ -3,7 +3,7 @@ import Button from "../../components/VButton.jsx";
 import Layout from "../../layouts/Layout.jsx";
 import DynamicModal from "../../components/Modal.jsx";
 import DynamicEditModal from "../../components/EditModal.jsx";
-import Table from "../../components/IteneryTable.jsx";
+import Table from "../../components/Table.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import EButton from "../../components/EditBtn.jsx";
@@ -42,14 +42,15 @@ export default function InclusionSetting() {
     },
   ];
 
-  const columns = [{ name: "Items", field: "items_name" }];
+  const columns = [
+    { key: "index", label: "S.no" },
+    { label: "Items", key: "items_name" },
+  ];
 
-  // useEffect to fetch itinerary data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/itenery-data");
-        // console.log(response);
+        const response = await fetch("/api/inclusion-data");
         if (!response.ok) {
           throw new Error("Failed to fetch profiles");
         }
@@ -65,86 +66,73 @@ export default function InclusionSetting() {
     fetchData();
   }, []);
 
-  // Action buttons for Edit/Delete
-  const renderActions = (itinerary, itineraryIdx, itineraryId) => {
+  const renderActions = (row) => {
     return (
       <>
         <EButton
           className="text-green-500"
           label={<FontAwesomeIcon icon={faPen} />}
-          onClick={() => handleEdit(itineraryId)} // <-- pass itineraryId
+          onClick={() => handleEdit(row._id)} // <-- pass itineraryId
         />
         &nbsp;
         <DButton
           className="text-white-500"
           label={<FontAwesomeIcon icon={faTrash} className="text-white-200" />}
-          onClick={() => handleDelete(itineraryId)} // <-- pass itineraryId
+          onClick={() => handleDelete(row._id)} // <-- pass itineraryId
         />
       </>
     );
   };
 
-  // Handle Submit form for adding new itinerary
   const handleModalSubmit = async (formData) => {
     try {
       for (let inclusionItem of formData.items_name) {
-        const dataToSend = {
-          items_name: inclusionItem,
-        };
+        const dataToSend = { items_name: inclusionItem };
 
-        // Send a POST request for each itinerary item
-        const res = await fetch("/api/inclusion-register", {
+        await fetch("/api/inclusion-register", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataToSend), // Send the data for each itinerary item
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dataToSend),
         });
-
-        // Handle response
-        const data = await res.json();
-        toast.success(data.message);
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
+
+      toast.success("All inclusions added successfully!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error submitting form:", error.message);
+      toast.error("Something went wrong.");
     }
   };
 
   const handleEditModalSubmit = async (updatedData) => {
     if (!selectedId) return;
     try {
-      const payload = {
-        package_name: editFormData?.package_name,
-        itinerary: updatedData.itinerary,
-      };
-
-      const response = await fetch(`/api/itenery-profile/${selectedId}`, {
+      const response = await fetch(`/api/inclusion-profile/${selectedId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(updatedData),
       });
 
       const result = await response.json();
-      setIsEditModalVisible(false);
       toast.warn(result.message);
       setTimeout(() => {
         window.location.reload();
-      }, 2000);
+      }, 3000);
+      setIsEditModalVisible(false);
     } catch (err) {
-      console.error("Error updating itinerary:", err);
+      console.error("Error updating:", err);
     }
   };
 
   const handleEdit = async (id) => {
     if (id) {
-      setSelectedId(id); // Ensure id is valid
+      setSelectedId(id);
       try {
-        const res = await fetch(`/api/itenery-profile/${id}`);
+        const res = await fetch(`/api/inclusion-profile/${id}`);
         const data = await res.json();
         setEditFormData(data);
         setIsEditModalVisible(true);
@@ -159,7 +147,7 @@ export default function InclusionSetting() {
       return;
     }
     try {
-      const res = await fetch(`/api/itenery-profile/${id}`, {
+      const res = await fetch(`/api/inclusion-profile/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -188,7 +176,7 @@ export default function InclusionSetting() {
         items={[
           { label: "Home", link: "/dashboard" },
           { label: "Classification", link: "#" },
-          { label: "Itinerary", link: "/classification/itinery" },
+          { label: "Inclusions", link: "/settings/inclusions" },
         ]}
       />
       {loading ? (
@@ -197,26 +185,25 @@ export default function InclusionSetting() {
         <div className="text-red-500">{error}</div>
       ) : (
         <div className="w-full overflow-x-auto">
-          <Table columns={columns} data={data} renderActions={renderActions} />
+          <Table columns={columns} data={data} actions={renderActions} />
         </div>
       )}
 
       <DynamicModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
-        title="Add Itinerary"
+        title="Add Items"
         fields={fields} // Fields for the form
         onSubmit={handleModalSubmit}
       />
       <DynamicEditModal
         visible={isEditModalVisible}
         onClose={() => setIsEditModalVisible(false)}
-        title="Edit Itinerary"
+        title="Edit Items"
         fields={editFields}
         onSubmit={handleEditModalSubmit}
         id={selectedId}
         defaultValues={editFormData}
-        packageName={editFormData?.package_name}
       />
     </Layout>
   );
