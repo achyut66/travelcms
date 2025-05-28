@@ -731,7 +731,7 @@ export default function CompanyProfile() {
           </span>
         ) : row.flag === 4 ? (
           <span className="bg-gray-300 p-3" title="Sent Person To Pick-Up">
-            "Picking-Up"
+            "Picking"
           </span>
         ) : row.flag === 3 ? (
           <span

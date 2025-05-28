@@ -14,6 +14,7 @@ const DynamicModal = ({
   bookingId,
 }) => {
   const [formData, setFormData] = useState({});
+  console.log(formData);
 
   const CustomInput = forwardRef(({ value, onClick, placeholder }, ref) => (
     <input

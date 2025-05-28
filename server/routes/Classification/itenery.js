@@ -6,49 +6,51 @@ const router = express.Router();
 // Create Nationality
 // Inside your route handler
 router.post('/itenery-register', async (req, res) => {
-    try {
-      const { package_name, itinerary } = req.body;
-  
-      if (!package_name || !itinerary) {
-        return res.status(400).json({ message: "Missing required fields." });
-      }
-  
-      const newItinerary = new itenerySettings({
-        package_name,
-        itinerary,
-      });
-  
-      await newItinerary.save();
-      res.status(201).json({ message: "Itinerary saved successfully.", data: newItinerary });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Server Error" });
+  try {
+    const { package_name, itinerary, description } = req.body;
+
+    if (!package_name || !itinerary || !description) {
+      return res.status(400).json({ message: "Missing required fields." });
     }
-  });
-  // Get All Nationalities
+
+    const newEntry = new itenerySettings({
+      package_name,
+      itinerary,
+      description,
+    });
+    console.log(newEntry);
+    const saved = await newEntry.save();
+    res.status(201).json({ message: "Itenery saved successfully.", data: saved });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
  // Fetch itineraries grouped by package_name
  router.get('/itenery-data', async (req, res) => {
-    try {
-      const itineraries = await itenerySettings.aggregate([
-        {
-          $group: {
-            _id: "$package_name",
-            itineraries: {
-              $push: {
-                _id: "$_id",     
-                itinerary: "$itinerary" 
-              }
+  try {
+    const itineraries = await itenerySettings.aggregate([
+      {
+        $group: {
+          _id: "$package_name",
+          itineraries: {
+            $push: {
+              _id: "$_id",
+              itinerary: "$itinerary",
+              description: "$description" // ✅ include this
             }
           }
         }
-      ]);
-      // console.log(itineraries);
-      res.status(200).json(itineraries);
-    } catch (error) {
-      console.error('GET /itenery-data error:', error);
-      res.status(500).json({ message: 'Unable to fetch itinerary data' });
-    }
-  });
+      }
+    ]);
+    res.status(200).json(itineraries);
+  } catch (error) {
+    console.error('GET /itenery-data error:', error);
+    res.status(500).json({ message: 'Unable to fetch itinerary data' });
+  }
+});
+
   
 // delete
 router.delete('/itenery-profile/:id', async (req, res) => {
@@ -88,20 +90,17 @@ router.get('/itenery-profile/:id', async (req, res) => {
 // Update Nationality by ID
 router.put('/itenery-profile/:id', async (req, res) => {
     const { id } = req.params;
-    const { package_name, itinerary } = req.body; // <-- FIX field names
-    console.log(id);
+    const { package_name, itinerary,description } = req.body; // <-- FIX field names
   
-    if (!package_name || typeof package_name !== 'string') {
+    if (!package_name || !itinerary || !description) {
       return res.status(400).json({ message: 'Package name is required and must be a string' });
     }
-    if (!itinerary || typeof itinerary !== 'string') {
-      return res.status(400).json({ message: 'Itinerary is required and must be a string' });
-    }
+    
   
     try {
       const updatedItinerary = await itenerySettings.findByIdAndUpdate(
         id,
-        { package_name, itinerary }, // <-- update with correct fields
+        { package_name, itinerary,description }, // <-- update with correct fields
         { new: true }
       );
   

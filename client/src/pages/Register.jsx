@@ -13,6 +13,7 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "user", // Default role
   });
   // profile fetch
   useEffect(() => {
@@ -66,9 +67,9 @@ const Register = () => {
           username: formData.username,
           email: formData.email,
           password: formData.password,
+          role: formData.role, // Include role in the request
         }),
       });
-      console.log(res);
       const data = await res.json();
       if (res.ok) {
         alert("User registered successfully!");

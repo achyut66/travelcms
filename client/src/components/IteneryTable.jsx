@@ -130,6 +130,9 @@ const Table = ({ columns, itemsPerPage = 2, renderActions }) => {
                       {i + 1 + "). " + itinerary.itinerary}{" "}
                       {/* <-- Use itinerary.itinerary */}
                     </td>
+                    <td className="px-4 py-2 border-b border-gray-300">
+                      {itinerary.description}
+                    </td>
                     {renderActions && (
                       <td className="px-4 py-2 text-sm border-b border-gray-300">
                         {renderActions(itinerary, i, itinerary._id)}{" "}

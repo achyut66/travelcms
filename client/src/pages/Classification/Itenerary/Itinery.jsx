@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../../components/VButton.jsx";
 import Layout from "../../../layouts/Layout.jsx";
-import DynamicModal from "../../../components/Modal.jsx";
+import DynamicModal from "../../../components/ExtrasModal.jsx";
 import DynamicEditModal from "../../../components/EditModal.jsx";
 import Table from "../../../components/IteneryTable.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -42,6 +42,35 @@ export default function NationalitySetting() {
   }, []);
 
   // Fields for adding/editing itinerary data
+  // const fields = [
+  //   {
+  //     name: "package_name",
+  //     label: "Package Name",
+  //     type: "select2",
+  //     options: isPackage.map((pcks) => ({
+  //       value: pcks.package,
+  //       label: pcks.package,
+  //     })),
+  //     defaultValue: "",
+  //   },
+  //   {
+  //     name: "itinerary",
+  //     label: "Itinerary",
+  //     type: "text",
+  //     defaultValue: "",
+  //     allowMultiple: true,
+  //     placeholder: "Enter itinerary",
+  //   },
+  //   {
+  //     name: "description",
+  //     label: "Description",
+  //     type: "text",
+  //     defaultValue: "",
+  //     allowMultiple: true,
+  //     placeholder: "Enter Description",
+  //   },
+  // ];
+
   const fields = [
     {
       name: "package_name",
@@ -54,12 +83,24 @@ export default function NationalitySetting() {
       defaultValue: "",
     },
     {
-      name: "itinerary",
-      label: "Itinerary",
-      type: "text",
-      defaultValue: "",
+      name: "itenery",
+      label: "Itenery",
+      type: "group",
       allowMultiple: true,
-      placeholder: "Enter itinerary",
+      fields: [
+        {
+          name: "itinerary",
+          label: "Itenerary",
+          type: "text",
+          placeholder: "Items",
+        },
+        {
+          name: "description",
+          label: "Description",
+          type: "text",
+          placeholder: "Description",
+        },
+      ],
     },
   ];
 
@@ -71,16 +112,25 @@ export default function NationalitySetting() {
       defaultValue: "",
       placeholder: "Enter itinerary",
     },
+    {
+      name: "description",
+      label: "Description",
+      type: "text",
+      defaultValue: "",
+      placeholder: "Description",
+    },
   ];
 
-  const columns = [{ name: "Itinerary", field: "itinerary" }];
+  const columns = [
+    { name: "Itinerary", field: "itinerary" },
+    { name: "Description", field: "description" },
+  ];
 
   // useEffect to fetch itinerary data
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch("/api/itenery-data");
-        // console.log(response);
         if (!response.ok) {
           throw new Error("Failed to fetch profiles");
         }
@@ -116,31 +166,30 @@ export default function NationalitySetting() {
   };
 
   // Handle Submit form for adding new itinerary
+
   const handleModalSubmit = async (formData) => {
     try {
-      // Loop over each itinerary item
-      for (let itineraryItem of formData.itinerary) {
-        // Prepare the data for each individual request
+      if (!formData.itenery || !Array.isArray(formData.itenery)) {
+        throw new Error("Itenery is missing or not an array.");
+      }
+
+      for (let itenry of formData.itenery) {
         const dataToSend = {
-          package_name: formData.package_name, // package name remains the same for each request
-          itinerary: itineraryItem, // individual itinerary item
+          package_name: formData.package_name,
+          itinerary: itenry.itinerary,
+          description: itenry.description, // Use existing description if not provided
         };
 
-        // Send a POST request for each itinerary item
         const res = await fetch("/api/itenery-register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(dataToSend), // Send the data for each itinerary item
+          body: JSON.stringify(dataToSend),
         });
 
-        // Handle response
         const data = await res.json();
         toast.success(data.message);
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
     } catch (error) {
       console.error("Error submitting form:", error.message);
@@ -153,6 +202,7 @@ export default function NationalitySetting() {
       const payload = {
         package_name: editFormData?.package_name,
         itinerary: updatedData.itinerary,
+        description: updatedData.description,
       };
 
       const response = await fetch(`/api/itenery-profile/${selectedId}`, {

@@ -164,15 +164,15 @@ const DashboardNotification = () => {
     <>
       <div className="relative group inline-block">
         <div className="cursor-pointer">
-          <FontAwesomeIcon icon={faBell} className="text-gray-700 text-xl" />
+          <FontAwesomeIcon icon={faBell} className="text-gray-700 text-3xl" />
           {hasNotification > 0 && (
-            <span className="absolute -top-1 -right-2 flex items-center justify-center h-4 w-4 text-xs font-bold text-white bg-red-600 rounded-full">
+            <span className="absolute top-[-10px] -right-2 flex items-center justify-center h-5 w-5 text-xs font-bold text-white bg-red-600 rounded-full">
               {hasNotification}
             </span>
           )}
         </div>
 
-        <div className="absolute right-[-290px] mt-[-20px] w-72 bg-white shadow-xl rounded-lg border border-gray-200 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 z-50">
+        <div className="absolute right-[-280px] mt-[-10px] w-72 bg-white shadow-xl rounded-lg border border-gray-200 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 z-50">
           <div className="p-4 max-h-64 overflow-y-auto">
             <div className="text-center font-semibold text-gray-800 text-md mb-3 border-b pb-1">
               🚐 Upcoming Pickups

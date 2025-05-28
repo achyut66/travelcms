@@ -453,9 +453,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
         }`}
       >
         <Clock />
-        <span>
+        {/* <span>
           <DashboardNotification />
-        </span>
+        </span> */}
       </div>
     </>
   );
